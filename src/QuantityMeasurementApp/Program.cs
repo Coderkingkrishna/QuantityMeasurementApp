@@ -99,6 +99,75 @@ namespace QuantityMeasurementApp
                 );
                 Console.WriteLine($"Input: Quantity(1.0, Feet) and Quantity(2.0, Feet)");
                 Console.WriteLine($"Output: Equal ({isDifferentFeet})");
+                Console.WriteLine();
+
+                // Demonstrate UC4: Yards and Centimeters
+                Console.WriteLine("=== UC4: Extended Unit Support (Yards & Centimeters) ===");
+
+                // Yard examples
+                var quantity1Yard = new QuantityLength(1.0, LengthUnit.Yards);
+                var quantity3Feet = new QuantityLength(3.0, LengthUnit.Feet);
+                var quantity36Inches = new QuantityLength(36.0, LengthUnit.Inches);
+                var quantity2Yards = new QuantityLength(2.0, LengthUnit.Yards);
+
+                // Example 1: 1 yard equals 3 feet
+                bool isYardEqualToFeet = quantityMeasurementService.AreEqual(
+                    quantity1Yard,
+                    quantity3Feet
+                );
+                Console.WriteLine($"Input: Quantity(1.0, Yards) and Quantity(3.0, Feet)");
+                Console.WriteLine($"Output: Equal ({isYardEqualToFeet})");
+                Console.WriteLine();
+
+                // Example 2: 1 yard equals 36 inches
+                bool isYardEqualToInches = quantityMeasurementService.AreEqual(
+                    quantity1Yard,
+                    quantity36Inches
+                );
+                Console.WriteLine($"Input: Quantity(1.0, Yards) and Quantity(36.0, Inches)");
+                Console.WriteLine($"Output: Equal ({isYardEqualToInches})");
+                Console.WriteLine();
+
+                // Example 3: 2 yards equals 2 yards
+                var anotherYard = new QuantityLength(2.0, LengthUnit.Yards);
+                bool isYardEqualToYard = quantityMeasurementService.AreEqual(
+                    quantity2Yards,
+                    anotherYard
+                );
+                Console.WriteLine($"Input: Quantity(2.0, Yards) and Quantity(2.0, Yards)");
+                Console.WriteLine($"Output: Equal ({isYardEqualToYard})");
+                Console.WriteLine();
+
+                // Centimeter examples
+                var quantity2Centimeters = new QuantityLength(2.0, LengthUnit.Centimeters);
+                var anotherCentimeter = new QuantityLength(2.0, LengthUnit.Centimeters);
+                var quantity1Centimeter = new QuantityLength(1.0, LengthUnit.Centimeters);
+                // 1 cm = 1/30.48 feet = 0.0328083989... feet = 0.393700787... inches
+                var quantityInchesFromCm = new QuantityLength(
+                    1.0 / 30.48 * 12.0,
+                    LengthUnit.Inches
+                );
+
+                // Example 4: 2 cm equals 2 cm
+                bool isCentimeterEqualToCentimeter = quantityMeasurementService.AreEqual(
+                    quantity2Centimeters,
+                    anotherCentimeter
+                );
+                Console.WriteLine(
+                    $"Input: Quantity(2.0, Centimeters) and Quantity(2.0, Centimeters)"
+                );
+                Console.WriteLine($"Output: Equal ({isCentimeterEqualToCentimeter})");
+                Console.WriteLine();
+
+                // Example 5: 1 cm equals its equivalent in inches
+                bool isCentimeterEqualToInches = quantityMeasurementService.AreEqual(
+                    quantity1Centimeter,
+                    quantityInchesFromCm
+                );
+                Console.WriteLine(
+                    $"Input: Quantity(1.0, Centimeters) and Quantity({1.0 / 30.48 * 12.0}, Inches)"
+                );
+                Console.WriteLine($"Output: Equal ({isCentimeterEqualToInches})");
             }
             // catch any exceptions that may occur during the execution of the program and display an error message
             catch (Exception exception)

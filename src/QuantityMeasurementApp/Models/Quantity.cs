@@ -49,7 +49,8 @@ namespace QuantityMeasurementApp.Core.Models
             double otherValueInBaseUnit = ConvertToBaseUnit(other.Value, other.Unit);
 
             // Compare the values in the base unit with tolerance for floating-point precision
-            return Math.Abs(thisValueInBaseUnit - otherValueInBaseUnit) < 1e-10;
+            // Tolerance set to 1e-9 to handle unit conversions with rounding
+            return Math.Abs(thisValueInBaseUnit - otherValueInBaseUnit) < 1e-9;
         }
 
         /// <summary>

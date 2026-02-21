@@ -10,6 +10,8 @@ namespace QuantityMeasurementApp.Core.Models
     {
         Feet,
         Inches,
+        Yards,
+        Centimeters,
     }
 
     /// <summary>
@@ -18,7 +20,15 @@ namespace QuantityMeasurementApp.Core.Models
     public static class LengthUnitExtensions
     {
         /// <summary>
-        /// Gets the conversion factor for a given LengthUnit relative to feet (base unit).
+        /// Gets the conversion factor for a given LengthUnit relative to feet (the base unit).
+        /// This method allows for easy conversion of different length units to a common base unit for comparison.
+        /// The conversion factors are defined as follows:
+        /// - Feet: 1.0 (base unit)
+        /// - Inches: 1.0 / 12.0 (1 foot = 12 inches)
+        /// - Yards: 3.0 (1 yard = 3 feet)
+        /// - Centimeters: 1.0 / 30.48 (1 foot = 30.48 centimeters)
+        /// This method throws an ArgumentException if an unsupported unit is provided.
+        ///
         /// </summary>
         /// <param name="unit">The unit to get the conversion factor for.</param>
         /// <returns>The conversion factor to convert from the given unit to feet.</returns>
@@ -28,20 +38,10 @@ namespace QuantityMeasurementApp.Core.Models
             {
                 LengthUnit.Feet => 1.0,
                 LengthUnit.Inches => 1.0 / 12.0,
+                LengthUnit.Yards => 3.0,
+                LengthUnit.Centimeters => 1.0 / 30.48,
                 _ => throw new ArgumentException($"Unsupported unit: {unit}"),
             };
-        }
-    }
-
-    public class Length
-    {
-        public double Value { get; }
-        public LengthUnit Unit { get; }
-
-        public Length(double value, LengthUnit unit)
-        {
-            Value = value;
-            Unit = unit;
         }
     }
 }
