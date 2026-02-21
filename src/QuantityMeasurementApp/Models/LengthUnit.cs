@@ -15,9 +15,9 @@ namespace QuantityMeasurementApp.Core.Models
     }
 
     /// <summary>
-    /// Extension methods for LengthUnit to provide conversion factor functionality.
+    /// Converter class for LengthUnit that provides conversion factor functionality.
     /// </summary>
-    public static class LengthUnitExtensions
+    public class LengthUnitConverter
     {
         /// <summary>
         /// Gets the conversion factor for a given LengthUnit relative to feet (the base unit).
@@ -32,7 +32,7 @@ namespace QuantityMeasurementApp.Core.Models
         /// </summary>
         /// <param name="unit">The unit to get the conversion factor for.</param>
         /// <returns>The conversion factor to convert from the given unit to feet.</returns>
-        public static double GetConversionFactor(this LengthUnit unit)
+        public double GetConversionFactor(LengthUnit unit)
         {
             return unit switch
             {

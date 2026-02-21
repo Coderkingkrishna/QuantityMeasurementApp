@@ -10,6 +10,8 @@ namespace QuantityMeasurementApp.Core.Models
     /// </summary>
     public sealed class QuantityLength : IEquatable<QuantityLength>
     {
+        private readonly LengthUnitConverter _converter;
+
         /// <summary>
         /// Gets the value of the quantity.
         /// </summary>
@@ -29,6 +31,7 @@ namespace QuantityMeasurementApp.Core.Models
         {
             Value = value;
             Unit = unit;
+            _converter = new LengthUnitConverter();
         }
 
         /// <summary>
@@ -79,9 +82,9 @@ namespace QuantityMeasurementApp.Core.Models
         /// Converts a value from a given unit to the base unit (feet).
         /// This method supports unit conversion for equality comparison.
         /// </summary>
-        private static double ConvertToBaseUnit(double value, LengthUnit unit)
+        private double ConvertToBaseUnit(double value, LengthUnit unit)
         {
-            double conversionFactor = unit.GetConversionFactor();
+            double conversionFactor = _converter.GetConversionFactor(unit);
             return value * conversionFactor;
         }
 
