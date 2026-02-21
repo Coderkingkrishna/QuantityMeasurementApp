@@ -37,6 +37,41 @@ UC2 extends UC1 by introducing equality comparison for Inches measurement alongs
 
 ---
 
+## 🚀 Use Case 3 (UC3) – QuantityLength with Unit Conversion (DRY)
+
+### Description
+
+UC3 refactors the duplicated Feet and Inches logic into a single QuantityLength class that uses a LengthUnit enum.
+This solves the DRY problem where Feet and Inches had nearly identical constructors and equality logic.
+
+### Problem Solved
+
+- Eliminates code duplication between Feet and Inches classes.
+- Enables cross-unit comparison (e.g., 1 ft == 12 inches) using a shared conversion path.
+- Makes it easier to add new length units without creating new classes.
+
+---
+
+## ✅ Features Implemented in UC3
+
+- LengthUnit enum with conversion factors
+- QuantityLength value object with unit-aware equality
+- Cross-unit comparison via base-unit conversion (feet)
+- Updated QuantityMeasurementService to support QuantityLength
+- New unit tests for cross-unit and same-unit equality
+
+---
+
+## 🧠 Concepts Demonstrated in UC3
+
+- DRY Principle (single class for multiple units)
+- Abstraction of conversion logic
+- Polymorphism via unit enum
+- Value-based equality with cross-unit support
+- Scalability for adding new units
+
+---
+
 ## 🧠 Concepts Demonstrated
 
 - Equality Contract:
@@ -73,14 +108,17 @@ src/
       ├── Program.cs
       ├── Models/
       │     ├── Feet.cs
-      │     └── Inches.cs
+   │     ├── Inches.cs
+   │     ├── LengthUnit.cs
+   │     └── Quantity.cs
       └── Services/
             └── QuantityMeasurementService.cs
 
 tests/
  └── QuantityMeasurementApp.Tests
       ├── FeetTests.cs
-      └── InchesTests.cs
+   ├── InchesTests.cs
+   └── QuantityTests.cs
 
 ---
 
@@ -105,6 +143,11 @@ Input: 1.0 inch and 1.0 inch
 Output: Equal (True)
 
 Input: 1.0 ft and 1.0 ft  
+Output: Equal (True)
+
+UC3 Example:
+
+Input: Quantity(1.0, Feet) and Quantity(12.0, Inches)
 Output: Equal (True)
 
 ---
