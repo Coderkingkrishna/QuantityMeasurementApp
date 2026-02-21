@@ -138,26 +138,7 @@ This demonstrates how the generic QuantityLength design scales effortlessly to a
 
 ## 📂 Project Structure
 
-QuantityMeasurementApp.sln
-
-src/
- └── QuantityMeasurementApp
-      ├── Program.cs
-      ├── Models/
-      │     ├── Feet.cs
-   │     ├── Inches.cs
-   │     ├── LengthUnit.cs
-   │     └── Quantity.cs
-      └── Services/
-            └── QuantityMeasurementService.cs
-
-tests/
- └── QuantityMeasurementApp.Tests
-      ├── FeetTests.cs
-   ├── InchesTests.cs
-   └── QuantityTests.cs
-
----
+<pre> ```text QuantityMeasurementApp.sln src/ └── QuantityMeasurementApp ├── Program.cs ├── Models/ │ ├── Feet.cs │ ├── Inches.cs │ ├── LengthUnit.cs │ └── Quantity.cs └── Services/ └── QuantityMeasurementService.cs tests/ └── QuantityMeasurementApp.Tests ├── FeetTests.cs ├── InchesTests.cs └── QuantityTests.cs ``` </pre>
 
 ## ▶ How to Run the Application
 
