@@ -72,6 +72,43 @@ This solves the DRY problem where Feet and Inches had nearly identical construct
 
 ---
 
+## 🚀 Use Case 4 (UC4) – Extended Unit Support (Yards & Centimeters)
+
+### Description
+
+UC4 extends UC3 by introducing Yards and Centimeters as additional length units to the QuantityLength class.
+This demonstrates how the generic QuantityLength design scales effortlessly to accommodate new units without code duplication.
+
+### Problem Solved
+
+- Validates the DRY principle design from UC3 by adding new units with minimal code changes.
+- Proves that adding units requires only enum modification, not new classes.
+- Enables complex multi-unit conversions (yards ↔ feet ↔ inches ↔ centimeters).
+
+---
+
+## ✅ Features Implemented in UC4
+
+- LengthUnit enum extended with Yards and Centimeters constants
+- Conversion factors: 1 Yard = 3 Feet, 1 cm = 1/30.48 Feet
+- QuantityLength unchanged – no modifications needed for new units
+- 32 new test cases covering yard, centimeter, and multi-unit comparisons
+- All UC1, UC2, UC3 functionality remains backward compatible
+
+---
+
+## 🧠 Concepts Demonstrated in UC4
+
+- **Scalability of Generic Design**: Adding units requires only enum modification
+- **Conversion Factor Management**: Centralized in enum for consistency
+- **Unit Relationships**: Understanding conversion to common base unit (feet)
+- **Enum Extensibility**: Type-safe approach to managing unit variations
+- **Mathematical Accuracy**: Precise conversion factors relative to base unit
+- **DRY Validation**: Proves the QuantityLength design eliminates duplication
+- **Backward Compatibility**: New units don't affect existing functionality
+
+---
+
 ## 🧠 Concepts Demonstrated
 
 - Equality Contract:
@@ -148,6 +185,20 @@ Output: Equal (True)
 UC3 Example:
 
 Input: Quantity(1.0, Feet) and Quantity(12.0, Inches)
+Output: Equal (True)
+
+UC4 Examples:
+
+Input: Quantity(1.0, Yards) and Quantity(3.0, Feet)
+Output: Equal (True)
+
+Input: Quantity(1.0, Yards) and Quantity(36.0, Inches)
+Output: Equal (True)
+
+Input: Quantity(2.0, Centimeters) and Quantity(2.0, Centimeters)
+Output: Equal (True)
+
+Input: Quantity(1.0, Centimeters) and Quantity(0.393701, Inches)
 Output: Equal (True)
 
 ---
