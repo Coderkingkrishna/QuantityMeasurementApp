@@ -101,6 +101,29 @@ namespace QuantityMeasurementApp.Core.Models
         }
 
         ///<summary>
+        /// Adds another QuantityLength to this instance, supporting cross-unit addition.
+        /// The method converts the other measurement to the same unit as this instance, performs the addition, and returns a new QuantityLength instance with the result.
+        /// </summary>
+        public QuantityLength Add(QuantityLength other)
+        {
+            if (other is null)
+                throw new ArgumentNullException(nameof(other));
+
+            double sumInCurrentUnit = Value + other.ConvertTo(Unit);
+            return new QuantityLength(sumInCurrentUnit, Unit);
+        }
+
+        ///<summary>
+        /// Adds a measurement specified by a value and unit to this instance, supporting cross-unit addition
+        /// The method creates a QuantityLength instance for the other measurement, performs the addition using the Add method, and returns a new QuantityLength instance with the result.
+        /// </summary>
+        public QuantityLength Add(double value, LengthUnit unit)
+        {
+            var other = new QuantityLength(value, unit);
+            return Add(other);
+        }
+
+        ///<summary>
         /// Helper method to convert a value from a specified unit to the base unit (feet).
         /// </summary>
         private double ConvertToBaseUnit(double value, LengthUnit unit)

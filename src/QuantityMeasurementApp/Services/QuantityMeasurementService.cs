@@ -60,5 +60,40 @@ namespace QuantityMeasurementApp.Core.Services
             var quantity = new QuantityLength(value, sourceUnit);
             return quantity.ConvertTo(targetUnit);
         }
+
+        /// <summary>
+        /// Adds two QuantityLength measurements together, supporting cross-unit addition.
+        /// This method converts both measurements to a common base unit (feet), performs the addition, and returns the result as a new QuantityLength instance in the target unit.
+        /// </summary>
+        public QuantityLength Add(QuantityLength firstMeasurement, QuantityLength secondMeasurement)
+        {
+            if (firstMeasurement is null)
+                throw new ArgumentNullException(nameof(firstMeasurement));
+
+            if (secondMeasurement is null)
+                throw new ArgumentNullException(nameof(secondMeasurement));
+
+            return firstMeasurement.Add(secondMeasurement);
+        }
+
+        /// <summary>
+        /// Adds two measurements together, supporting cross-unit addition.
+        /// This method creates QuantityLength instances for both measurements, performs the addition using the Add method of QuantityLength, and returns the result as a new QuantityLength instance in the target unit.
+        /// <code>
+        /// var service = new QuantityMeasurementService();
+        /// var result = service.Add(1.0, LengthUnit.Feet, 12.0, LengthUnit.Inches);
+        /// // result will be a QuantityLength instance representing the sum of the two measurements, converted to the target unit.
+        /// /// </code>
+        /// </summary>
+        public QuantityLength Add(
+            double firstValue,
+            LengthUnit firstUnit,
+            double secondValue,
+            LengthUnit secondUnit
+        )
+        {
+            var firstMeasurement = new QuantityLength(firstValue, firstUnit);
+            return firstMeasurement.Add(secondValue, secondUnit);
+        }
     }
 }

@@ -189,6 +189,25 @@ namespace QuantityMeasurementApp
                 Console.WriteLine(
                     $"Input: convert(0.0, Feet, Inches) -> Output: {quantityMeasurementService.Convert(0.0, LengthUnit.Feet, LengthUnit.Inches)}"
                 );
+                Console.WriteLine();
+
+                // Demonstrate UC6: Addition of Two Length Units
+                Console.WriteLine("=== UC6: Addition of Two Length Units ===");
+                var sumFeetAndInches = quantityMeasurementService.Add(
+                    new QuantityLength(1.0, LengthUnit.Feet),
+                    new QuantityLength(12.0, LengthUnit.Inches)
+                );
+                Console.WriteLine(
+                    $"Input: add(Quantity(1.0, Feet), Quantity(12.0, Inches)) -> Output: {sumFeetAndInches}"
+                );
+                // Example of adding raw values with specified units
+                var sumRawValues = quantityMeasurementService.Add(
+                    2.0,
+                    LengthUnit.Feet,
+                    24.0,
+                    LengthUnit.Inches
+                );
+                Console.WriteLine($"Input: add(2.0, Feet, 24.0, Inches) -> Output: {sumRawValues}");
             }
             // catch any exceptions that may occur during the execution of the program and display an error message
             catch (Exception exception)
