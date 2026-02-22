@@ -31,7 +31,7 @@ UC2 extends UC1 by introducing equality comparison for Inches measurement alongs
 - Immutable `Inches` value object
 - Proper override of `Equals()` and `GetHashCode()`
 - Implementation of `IEquatable<T>` for both classes
-- Static equality methods in `QuantityMeasurementService`
+- Equality methods in `QuantityMeasurementService`
 - MSTest unit test coverage for both Feet and Inches
 - Clean architecture separation (src and tests layers)
 
@@ -109,6 +109,41 @@ This demonstrates how the generic QuantityLength design scales effortlessly to a
 
 ---
 
+## 🚀 Use Case 5 (UC5) – Unit-to-Unit Conversion (Same Measurement Type)
+
+### Description
+
+UC5 extends UC4 by adding explicit unit conversion APIs for length values.
+Instead of only checking equality, the app now converts values between supported units (Feet, Inches, Yards, Centimeters) through a shared base-unit normalization path.
+
+### Problem Solved
+
+- Provides direct conversion for same measurement type (length) using one consistent formula.
+- Keeps conversion logic centralized and reusable.
+- Preserves immutability by returning converted values/new instances without mutating existing objects.
+
+---
+
+## ✅ Features Implemented in UC5
+
+- Non-static conversion API in `QuantityLength`: `ConvertTo(LengthUnit targetUnit)`
+- Non-static conversion API in `QuantityMeasurementService`: `Convert(double value, LengthUnit sourceUnit, LengthUnit targetUnit)`
+- Conversion formula: `result = value × (sourceFactor / targetFactor)`
+- Input validation for finite values and supported enum units
+- Separate focused conversion tests in `UnitConversionTests.cs`
+
+---
+
+## 🧠 Concepts Demonstrated in UC5
+
+- Base-unit normalization for cross-unit conversion
+- Enum-driven conversion factor management
+- Value object immutability and conversion without side effects
+- Precision handling with epsilon-based assertions in tests
+- Clear API design for conversion and equality responsibilities
+
+---
+
 ## 🧠 Concepts Demonstrated
 
 - Equality Contract:
@@ -156,7 +191,8 @@ tests/
 └── QuantityMeasurementApp.Tests
     ├── FeetTests.cs
     ├── InchesTests.cs
-    └── QuantityTests.cs
+   ├── QuantityTests.cs
+   └── UnitConversionTests.cs
 ```
 ## ▶ How to Run the Application
 
@@ -199,6 +235,23 @@ Output: Equal (True)
 
 Input: Quantity(1.0, Centimeters) and Quantity(0.393701, Inches)
 Output: Equal (True)
+
+UC5 Examples:
+
+Input: convert(1.0, Feet, Inches)
+Output: 12.0
+
+Input: convert(3.0, Yards, Feet)
+Output: 9.0
+
+Input: convert(36.0, Inches, Yards)
+Output: 1.0
+
+Input: convert(1.0, Centimeters, Inches)
+Output: 0.393700787...
+
+Input: convert(0.0, Feet, Inches)
+Output: 0.0
 
 ---
 
