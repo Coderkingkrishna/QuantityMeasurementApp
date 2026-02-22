@@ -10,6 +10,7 @@ namespace QuantityMeasurementApp.Core.Models
     /// </summary>
     public sealed class QuantityLength : IEquatable<QuantityLength>
     {
+        private const double Epsilon = 1e-9;
         private readonly LengthUnitConverter _converter;
 
         /// <summary>
@@ -23,22 +24,28 @@ namespace QuantityMeasurementApp.Core.Models
         public LengthUnit Unit { get; }
 
         /// <summary>
-        /// Initializes a new instance of the QuantityLength class with a value and unit.
-        /// </summary>
-        /// <param name="value">The numerical value of the quantity.</param>
-        /// <param name="unit">The unit of measurement for the quantity.</param>
+        /// Initializes a new instance of the QuantityLength class with the specified value and unit.
+        /// The constructor validates that the value is a finite number and that the unit is a defined LengthUnit.
+        /// If the value is not finite or the unit is not supported, an ArgumentException is thrown.
+        /// This ensures that the QuantityLength instances are always in a valid state, preventing issues during comparisons and conversions.
+        ///</summary>
         public QuantityLength(double value, LengthUnit unit)
         {
+            if (!double.IsFinite(value))
+                throw new ArgumentException("Value must be a finite number.", nameof(value));
+
+            if (!Enum.IsDefined(typeof(LengthUnit), unit))
+                throw new ArgumentException($"Unsupported unit: {unit}", nameof(unit));
+
             Value = value;
             Unit = unit;
             _converter = new LengthUnitConverter();
         }
 
-        /// <summary>
-        /// Compares two QuantityLength instances for equality by converting them to a common base unit (feet).
+        ///<summary>
+        /// Compares this QuantityLength instance with another for equality, supporting cross-unit comparison.
+        /// The method converts both measurements to a common base unit (feet) before comparing their values.
         /// </summary>
-        /// <param name="other">The other Quantity instance to compare with.</param>
-        /// <returns>True if the quantities are equal after conversion to the base unit; otherwise, false.</returns>
         public bool Equals(QuantityLength? other)
         {
             if (ReferenceEquals(null, other))
@@ -47,20 +54,12 @@ namespace QuantityMeasurementApp.Core.Models
             if (ReferenceEquals(this, other))
                 return true;
 
-            // Convert both quantities to the base unit (feet) for comparison
             double thisValueInBaseUnit = ConvertToBaseUnit(this.Value, this.Unit);
             double otherValueInBaseUnit = ConvertToBaseUnit(other.Value, other.Unit);
 
-            // Compare the values in the base unit with tolerance for floating-point precision
-            // Tolerance set to 1e-9 to handle unit conversions with rounding
-            return Math.Abs(thisValueInBaseUnit - otherValueInBaseUnit) < 1e-9;
+            return Math.Abs(thisValueInBaseUnit - otherValueInBaseUnit) < Epsilon;
         }
 
-        /// <summary>
-        /// Compares this QuantityLength instance with another object for equality.
-        /// </summary>
-        /// <param name="obj">The object to compare with.</param>
-        /// <returns>True if the object is a Quantity of the same type and is equal; otherwise, false.</returns>
         public override bool Equals(object? obj)
         {
             if (obj is not QuantityLength other)
@@ -69,18 +68,40 @@ namespace QuantityMeasurementApp.Core.Models
             return Equals(other);
         }
 
-        /// <summary>
-        /// Gets the hash code of this Quantity instance.
-        /// Returns the base unit value's hash code for consistent hashing.
+        ///<summary>
+        /// Returns the hash code for this instance.
+        /// The hash code is based on the value converted to the base unit (feet).
         /// </summary>
         public override int GetHashCode()
         {
             return ConvertToBaseUnit(Value, Unit).GetHashCode();
         }
 
-        /// <summary>
-        /// Converts a value from a given unit to the base unit (feet).
-        /// This method supports unit conversion for equality comparison.
+        ///<summary>
+        /// Converts the quantity to the specified target unit.
+        /// The method first converts the value to the base unit (feet) and then converts it to the target unit using the conversion factor from the LengthUnitConverter.
+        /// </summary>
+        public double ConvertTo(LengthUnit targetUnit)
+        {
+            if (!Enum.IsDefined(typeof(LengthUnit), targetUnit))
+                throw new ArgumentException($"Unsupported unit: {targetUnit}", nameof(targetUnit));
+
+            double valueInBaseUnit = ConvertToBaseUnit(Value, Unit);
+            double targetConversionFactor = _converter.GetConversionFactor(targetUnit);
+
+            return valueInBaseUnit / targetConversionFactor;
+        }
+
+        ///<summary>
+        /// Converts the quantity to a new QuantityLength instance with the specified target unit.
+        /// </summary>
+        public QuantityLength ConvertToQuantity(LengthUnit targetUnit)
+        {
+            return new QuantityLength(ConvertTo(targetUnit), targetUnit);
+        }
+
+        ///<summary>
+        /// Helper method to convert a value from a specified unit to the base unit (feet).
         /// </summary>
         private double ConvertToBaseUnit(double value, LengthUnit unit)
         {
@@ -88,8 +109,9 @@ namespace QuantityMeasurementApp.Core.Models
             return value * conversionFactor;
         }
 
-        /// <summary>
-        /// Returns a string representation of this QuantityLength instance.
+        ///<summary>
+        /// Compares this QuantityLength instance with another for equality, supporting cross-unit comparison.
+        /// The method converts both measurements to a common base unit (feet) before comparing their values.
         /// </summary>
         public override string ToString()
         {

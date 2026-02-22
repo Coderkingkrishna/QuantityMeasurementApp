@@ -168,6 +168,27 @@ namespace QuantityMeasurementApp
                     $"Input: Quantity(1.0, Centimeters) and Quantity({1.0 / 30.48 * 12.0}, Inches)"
                 );
                 Console.WriteLine($"Output: Equal ({isCentimeterEqualToInches})");
+                Console.WriteLine();
+
+                //Demonstrate UC5: Unit-to-Unit Conversion
+
+                Console.WriteLine("=== UC5: Unit-to-Unit Conversion ===");
+                // Example conversions using the Convert method in QuantityMeasurementService
+                Console.WriteLine(
+                    $"Input: convert(1.0, Feet, Inches) -> Output: {quantityMeasurementService.Convert(1.0, LengthUnit.Feet, LengthUnit.Inches)}"
+                );
+                Console.WriteLine(
+                    $"Input: convert(3.0, Yards, Feet) -> Output: {quantityMeasurementService.Convert(3.0, LengthUnit.Yards, LengthUnit.Feet)}"
+                );
+                Console.WriteLine(
+                    $"Input: convert(36.0, Inches, Yards) -> Output: {quantityMeasurementService.Convert(36.0, LengthUnit.Inches, LengthUnit.Yards)}"
+                );
+                Console.WriteLine(
+                    $"Input: convert(1.0, Centimeters, Inches) -> Output: {quantityMeasurementService.Convert(1.0, LengthUnit.Centimeters, LengthUnit.Inches)}"
+                );
+                Console.WriteLine(
+                    $"Input: convert(0.0, Feet, Inches) -> Output: {quantityMeasurementService.Convert(0.0, LengthUnit.Feet, LengthUnit.Inches)}"
+                );
             }
             // catch any exceptions that may occur during the execution of the program and display an error message
             catch (Exception exception)

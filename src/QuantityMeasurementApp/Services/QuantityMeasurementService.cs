@@ -49,5 +49,16 @@ namespace QuantityMeasurementApp.Core.Services
         {
             return firstMeasurement.Equals(secondMeasurement);
         }
+
+        /// <summary>
+        /// Converts a measurement from a source unit to a target unit using the QuantityLength class for conversion.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <param name="sourceUnit">The unit of the value to convert.</param>
+        public double Convert(double value, LengthUnit sourceUnit, LengthUnit targetUnit)
+        {
+            var quantity = new QuantityLength(value, sourceUnit);
+            return quantity.ConvertTo(targetUnit);
+        }
     }
 }
