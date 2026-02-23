@@ -113,6 +113,18 @@ namespace QuantityMeasurementApp.Core.Models
             return new QuantityLength(sumInCurrentUnit, Unit);
         }
 
+        public QuantityLength Add(QuantityLength other, LengthUnit targetUnit)
+        {
+            if (other is null)
+                throw new ArgumentNullException(nameof(other));
+
+            if (!Enum.IsDefined(typeof(LengthUnit), targetUnit))
+                throw new ArgumentException($"Unsupported unit: {targetUnit}", nameof(targetUnit));
+
+            double sumInTargetUnit = ConvertTo(targetUnit) + other.ConvertTo(targetUnit);
+            return new QuantityLength(sumInTargetUnit, targetUnit);
+        }
+
         ///<summary>
         /// Adds a measurement specified by a value and unit to this instance, supporting cross-unit addition
         /// The method creates a QuantityLength instance for the other measurement, performs the addition using the Add method, and returns a new QuantityLength instance with the result.
@@ -121,6 +133,12 @@ namespace QuantityMeasurementApp.Core.Models
         {
             var other = new QuantityLength(value, unit);
             return Add(other);
+        }
+
+        public QuantityLength Add(double value, LengthUnit unit, LengthUnit targetUnit)
+        {
+            var other = new QuantityLength(value, unit);
+            return Add(other, targetUnit);
         }
 
         ///<summary>

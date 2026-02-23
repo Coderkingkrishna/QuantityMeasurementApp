@@ -76,6 +76,25 @@ namespace QuantityMeasurementApp.Core.Services
             return firstMeasurement.Add(secondMeasurement);
         }
 
+        ///<summary>
+        /// Adds two QuantityLength measurements together, supporting cross-unit addition and allowing the caller to specify the target unit for the result.
+        /// This method converts both measurements to the specified target unit, performs the addition, and returns the result as a new QuantityLength instance in the target unit.
+        /// </summary>
+        public QuantityLength Add(
+            QuantityLength firstMeasurement,
+            QuantityLength secondMeasurement,
+            LengthUnit targetUnit
+        )
+        {
+            if (firstMeasurement is null)
+                throw new ArgumentNullException(nameof(firstMeasurement));
+
+            if (secondMeasurement is null)
+                throw new ArgumentNullException(nameof(secondMeasurement));
+
+            return firstMeasurement.Add(secondMeasurement, targetUnit);
+        }
+
         /// <summary>
         /// Adds two measurements together, supporting cross-unit addition.
         /// This method creates QuantityLength instances for both measurements, performs the addition using the Add method of QuantityLength, and returns the result as a new QuantityLength instance in the target unit.
@@ -94,6 +113,22 @@ namespace QuantityMeasurementApp.Core.Services
         {
             var firstMeasurement = new QuantityLength(firstValue, firstUnit);
             return firstMeasurement.Add(secondValue, secondUnit);
+        }
+
+        /// <summary>
+        /// Adds two measurements together, supporting cross-unit addition and allowing the caller to specify the target unit for the result.
+        /// This method creates QuantityLength instances for both measurements, performs the addition using the Add method of QuantityLength, and returns the result as a new QuantityLength instance in the specified target unit.
+        /// </summary>
+        public QuantityLength Add(
+            double firstValue,
+            LengthUnit firstUnit,
+            double secondValue,
+            LengthUnit secondUnit,
+            LengthUnit targetUnit
+        )
+        {
+            var firstMeasurement = new QuantityLength(firstValue, firstUnit);
+            return firstMeasurement.Add(secondValue, secondUnit, targetUnit);
         }
     }
 }
