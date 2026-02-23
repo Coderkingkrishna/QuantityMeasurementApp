@@ -144,6 +144,43 @@ Instead of only checking equality, the app now converts values between supported
 
 ---
 
+## 🚀 Use Case 6 (UC6) – Addition of Two Length Units (Same Category)
+
+### Description
+
+UC6 extends UC5 by adding arithmetic support for length values.
+Two measurements can be added even when units differ, and the result can be returned in either the first operand unit or an explicitly provided target unit.
+
+### Problem Solved
+
+- Supports same-unit and cross-unit addition through the existing conversion pipeline.
+- Preserves immutability by returning new `QuantityLength` objects.
+- Enables clear API usage for domain arithmetic on value objects.
+
+---
+
+## ✅ Features Implemented in UC6
+
+- `QuantityLength.Add(QuantityLength other)`
+- `QuantityLength.Add(QuantityLength other, LengthUnit targetUnit)`
+- `QuantityLength.Add(double value, LengthUnit unit)`
+- `QuantityLength.Add(double value, LengthUnit unit, LengthUnit targetUnit)`
+- Service overloads for object and raw-value addition in `QuantityMeasurementService`
+- Validation for null operands and invalid/unsupported units
+- Dedicated UC6 test suite in `UnitAdditionTests.cs`
+
+---
+
+## 🧠 Concepts Demonstrated in UC6
+
+- Same-unit and cross-unit addition
+- Commutativity checks in a shared target unit
+- Identity behavior with zero
+- Floating-point precision handling with epsilon tolerance
+- Input validation and defensive error handling
+
+---
+
 ## 🧠 Concepts Demonstrated
 
 - Equality Contract:
@@ -192,7 +229,8 @@ tests/
     ├── FeetTests.cs
     ├── InchesTests.cs
    ├── QuantityTests.cs
-   └── UnitConversionTests.cs
+   ├── UnitConversionTests.cs
+   └── UnitAdditionTests.cs
 ```
 ## ▶ How to Run the Application
 
@@ -252,6 +290,17 @@ Output: 0.393700787...
 
 Input: convert(0.0, Feet, Inches)
 Output: 0.0
+
+UC6 Examples:
+
+Input: add(Quantity(1.0, Feet), Quantity(12.0, Inches))
+Output: Quantity(2.0, Feet)
+
+Input: add(12.0, Inches, 1.0, Feet, Inches)
+Output: Quantity(24.0, Inches)
+
+Input: add(1.0, Yards, 3.0, Feet, Yards)
+Output: Quantity(2.0, Yards)
 
 ---
 
