@@ -215,6 +215,42 @@ The operation still adds values through a common base-unit path, but the final o
 
 ---
 
+## 🚀 Use Case 8 (UC8) – Standalone Unit with Conversion Responsibility
+
+### Description
+
+UC8 refactors unit conversion ownership by keeping `LengthUnit` as a standalone top-level enum and assigning conversion responsibility directly to it.
+`QuantityLength` delegates conversion behavior to the unit, improving cohesion and supporting scalable patterns for future measurement categories.
+
+### Problem Solved
+
+- Centralizes conversion logic in the unit abstraction.
+- Reduces coupling in `QuantityLength` by removing dedicated converter-object dependency.
+- Preserves full backward compatibility for UC1–UC7 public APIs.
+
+---
+
+## ✅ Features Implemented in UC8
+
+- `LengthUnit` conversion responsibilities:
+   - `GetConversionFactor()`
+   - `ConvertToBaseUnit(double value)`
+   - `ConvertFromBaseUnit(double baseValue)`
+- `QuantityLength` now delegates conversions to `LengthUnit` conversion methods
+- Existing equality, conversion, and addition APIs remain unchanged
+- Dedicated UC8 test suite added in `LengthUnitTests.cs`
+
+---
+
+## 🧠 Concepts Demonstrated in UC8
+
+- Single Responsibility Principle for unit conversion logic
+- Delegation of conversion behavior from quantity object to unit abstraction
+- Improved architectural scalability for additional categories (weight/volume/etc.)
+- Backward-compatible refactoring with no client API breakage
+
+---
+
 ## 🧠 Concepts Demonstrated
 
 - Equality Contract:
@@ -264,7 +300,8 @@ tests/
     ├── InchesTests.cs
    ├── QuantityTests.cs
    ├── UnitConversionTests.cs
-   └── UnitAdditionTests.cs
+   ├── UnitAdditionTests.cs
+   └── LengthUnitTests.cs
 ```
 ## ▶ How to Run the Application
 
@@ -349,6 +386,20 @@ Output: Quantity(0.666..., Yards)
 
 Input: add(Quantity(36.0, Inches), Quantity(1.0, Yards), Feet)
 Output: Quantity(6.0, Feet)
+
+UC8 Examples:
+
+Input: LengthUnit.Feet.ConvertToBaseUnit(12.0)
+Output: 12.0
+
+Input: LengthUnit.Inches.ConvertToBaseUnit(12.0)
+Output: 1.0
+
+Input: Quantity(1.0, Feet).convertTo(Inches)
+Output: Quantity(12.0, Inches)
+
+Input: Quantity(1.0, Feet).add(Quantity(12.0, Inches), Yards)
+Output: Quantity(0.666..., Yards)
 
 ---
 
