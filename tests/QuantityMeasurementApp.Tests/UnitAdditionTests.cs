@@ -184,5 +184,153 @@ namespace QuantityMeasurementApp.Tests
                 service.Add(null!, second, LengthUnit.Feet)
             );
         }
+
+        [TestMethod]
+        // Verifies explicit target as a third unit (different from both operands).
+        public void Addition_ExplicitTargetUnit_Yards_FromFeetAndInches()
+        {
+            var service = new QuantityMeasurementService();
+
+            var result = service.Add(
+                1.0,
+                LengthUnit.Feet,
+                12.0,
+                LengthUnit.Inches,
+                LengthUnit.Yards
+            );
+
+            Assert.AreEqual(2.0 / 3.0, result.Value, Epsilon);
+            Assert.AreEqual(LengthUnit.Yards, result.Unit);
+        }
+
+        [TestMethod]
+        // Verifies explicit target unit conversion to centimeters.
+        public void Addition_ExplicitTargetUnit_Centimeters_FromInches()
+        {
+            var service = new QuantityMeasurementService();
+
+            var result = service.Add(
+                1.0,
+                LengthUnit.Inches,
+                1.0,
+                LengthUnit.Inches,
+                LengthUnit.Centimeters
+            );
+
+            Assert.AreEqual(5.08, result.Value, Epsilon);
+            Assert.AreEqual(LengthUnit.Centimeters, result.Unit);
+        }
+
+        [TestMethod]
+        // Verifies explicit target matching first operand unit.
+        public void Addition_ExplicitTargetUnit_SameAsFirstOperand()
+        {
+            var service = new QuantityMeasurementService();
+
+            var result = service.Add(2.0, LengthUnit.Yards, 3.0, LengthUnit.Feet, LengthUnit.Yards);
+
+            Assert.AreEqual(3.0, result.Value, Epsilon);
+            Assert.AreEqual(LengthUnit.Yards, result.Unit);
+        }
+
+        [TestMethod]
+        // Verifies explicit target matching second operand unit.
+        public void Addition_ExplicitTargetUnit_SameAsSecondOperand()
+        {
+            var service = new QuantityMeasurementService();
+
+            var result = service.Add(2.0, LengthUnit.Yards, 3.0, LengthUnit.Feet, LengthUnit.Feet);
+
+            Assert.AreEqual(9.0, result.Value, Epsilon);
+            Assert.AreEqual(LengthUnit.Feet, result.Unit);
+        }
+
+        [TestMethod]
+        // Verifies commutativity with explicit third target unit.
+        public void Addition_ExplicitTargetUnit_CommutativeInYards()
+        {
+            var service = new QuantityMeasurementService();
+
+            var first = service.Add(
+                1.0,
+                LengthUnit.Feet,
+                12.0,
+                LengthUnit.Inches,
+                LengthUnit.Yards
+            );
+            var second = service.Add(
+                12.0,
+                LengthUnit.Inches,
+                1.0,
+                LengthUnit.Feet,
+                LengthUnit.Yards
+            );
+
+            Assert.AreEqual(first.Value, second.Value, Epsilon);
+            Assert.AreEqual(LengthUnit.Yards, first.Unit);
+            Assert.AreEqual(LengthUnit.Yards, second.Unit);
+        }
+
+        [TestMethod]
+        // Verifies zero operand with explicit target conversion.
+        public void Addition_ExplicitTargetUnit_WithZero_ResultInYards()
+        {
+            var service = new QuantityMeasurementService();
+
+            var result = service.Add(
+                5.0,
+                LengthUnit.Feet,
+                0.0,
+                LengthUnit.Inches,
+                LengthUnit.Yards
+            );
+
+            Assert.AreEqual(5.0 / 3.0, result.Value, Epsilon);
+            Assert.AreEqual(LengthUnit.Yards, result.Unit);
+        }
+
+        [TestMethod]
+        // Verifies negative value addition with explicit target conversion.
+        public void Addition_ExplicitTargetUnit_WithNegative_ResultInInches()
+        {
+            var service = new QuantityMeasurementService();
+
+            var result = service.Add(
+                5.0,
+                LengthUnit.Feet,
+                -2.0,
+                LengthUnit.Feet,
+                LengthUnit.Inches
+            );
+
+            Assert.AreEqual(36.0, result.Value, Epsilon);
+            Assert.AreEqual(LengthUnit.Inches, result.Unit);
+        }
+
+        [TestMethod]
+        // Verifies mathematical equivalence across different target units.
+        public void Addition_ExplicitTargetUnit_MathematicalEquivalenceAcrossTargets()
+        {
+            var service = new QuantityMeasurementService();
+
+            var inFeet = service.Add(
+                1.0,
+                LengthUnit.Feet,
+                12.0,
+                LengthUnit.Inches,
+                LengthUnit.Feet
+            );
+            var inInches = service.Add(
+                1.0,
+                LengthUnit.Feet,
+                12.0,
+                LengthUnit.Inches,
+                LengthUnit.Inches
+            );
+
+            Assert.AreEqual(2.0, inFeet.Value, Epsilon);
+            Assert.AreEqual(24.0, inInches.Value, Epsilon);
+            Assert.AreEqual(inFeet.Value * 12.0, inInches.Value, Epsilon);
+        }
     }
 }

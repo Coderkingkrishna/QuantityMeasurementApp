@@ -208,6 +208,21 @@ namespace QuantityMeasurementApp
                     LengthUnit.Inches
                 );
                 Console.WriteLine($"Input: add(2.0, Feet, 24.0, Inches) -> Output: {sumRawValues}");
+                Console.WriteLine();
+
+                Console.WriteLine("=== UC7: Addition with Target Unit Specification ===");
+                Console.WriteLine(
+                    $"Input: add(Quantity(1.0, Feet), Quantity(12.0, Inches), Feet) -> Output: {quantityMeasurementService.Add(1.0, LengthUnit.Feet, 12.0, LengthUnit.Inches, LengthUnit.Feet)}"
+                );
+                Console.WriteLine(
+                    $"Input: add(Quantity(1.0, Feet), Quantity(12.0, Inches), Inches) -> Output: {quantityMeasurementService.Add(1.0, LengthUnit.Feet, 12.0, LengthUnit.Inches, LengthUnit.Inches)}"
+                );
+                Console.WriteLine(
+                    $"Input: add(Quantity(1.0, Feet), Quantity(12.0, Inches), Yards) -> Output: {quantityMeasurementService.Add(1.0, LengthUnit.Feet, 12.0, LengthUnit.Inches, LengthUnit.Yards)}"
+                );
+                Console.WriteLine(
+                    $"Input: add(Quantity(36.0, Inches), Quantity(1.0, Yards), Feet) -> Output: {quantityMeasurementService.Add(36.0, LengthUnit.Inches, 1.0, LengthUnit.Yards, LengthUnit.Feet)}"
+                );
             }
             // catch any exceptions that may occur during the execution of the program and display an error message
             catch (Exception exception)
