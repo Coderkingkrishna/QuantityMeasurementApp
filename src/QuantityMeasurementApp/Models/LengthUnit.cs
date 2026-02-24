@@ -15,9 +15,10 @@ namespace QuantityMeasurementApp.Core.Models
     }
 
     /// <summary>
-    /// Converter class for LengthUnit that provides conversion factor functionality.
+    /// Extension methods for LengthUnit that provide conversion responsibility
+    /// to and from the base unit (feet).
     /// </summary>
-    public class LengthUnitConverter
+    public static class LengthUnitExtensions
     {
         /// <summary>
         /// Gets the conversion factor for a given LengthUnit relative to feet (the base unit).
@@ -32,7 +33,7 @@ namespace QuantityMeasurementApp.Core.Models
         /// </summary>
         /// <param name="unit">The unit to get the conversion factor for.</param>
         /// <returns>The conversion factor to convert from the given unit to feet.</returns>
-        public double GetConversionFactor(LengthUnit unit)
+        public static double GetConversionFactor(this LengthUnit unit)
         {
             return unit switch
             {
@@ -42,6 +43,28 @@ namespace QuantityMeasurementApp.Core.Models
                 LengthUnit.Centimeters => 1.0 / 30.48,
                 _ => throw new ArgumentException($"Unsupported unit: {unit}"),
             };
+        }
+
+        /// <summary>
+        /// Converts a value in this unit to the base unit (feet).
+        /// </summary>
+        /// <param name="unit">The source unit.</param>
+        /// <param name="value">The value in the source unit.</param>
+        /// <returns>The converted value in feet.</returns>
+        public static double ConvertToBaseUnit(this LengthUnit unit, double value)
+        {
+            return value * unit.GetConversionFactor();
+        }
+
+        /// <summary>
+        /// Converts a base-unit (feet) value to this unit.
+        /// </summary>
+        /// <param name="unit">The target unit.</param>
+        /// <param name="baseValue">The value in feet.</param>
+        /// <returns>The converted value in the target unit.</returns>
+        public static double ConvertFromBaseUnit(this LengthUnit unit, double baseValue)
+        {
+            return baseValue / unit.GetConversionFactor();
         }
     }
 }

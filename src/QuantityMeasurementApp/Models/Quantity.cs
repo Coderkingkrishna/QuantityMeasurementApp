@@ -11,7 +11,6 @@ namespace QuantityMeasurementApp.Core.Models
     public sealed class QuantityLength : IEquatable<QuantityLength>
     {
         private const double Epsilon = 1e-9;
-        private readonly LengthUnitConverter _converter;
 
         /// <summary>
         /// Gets the value of the quantity.
@@ -39,7 +38,6 @@ namespace QuantityMeasurementApp.Core.Models
 
             Value = value;
             Unit = unit;
-            _converter = new LengthUnitConverter();
         }
 
         ///<summary>
@@ -86,10 +84,8 @@ namespace QuantityMeasurementApp.Core.Models
             if (!Enum.IsDefined(typeof(LengthUnit), targetUnit))
                 throw new ArgumentException($"Unsupported unit: {targetUnit}", nameof(targetUnit));
 
-            double valueInBaseUnit = ConvertToBaseUnit(Value, Unit);
-            double targetConversionFactor = _converter.GetConversionFactor(targetUnit);
-
-            return valueInBaseUnit / targetConversionFactor;
+            double valueInBaseUnit = Unit.ConvertToBaseUnit(Value);
+            return targetUnit.ConvertFromBaseUnit(valueInBaseUnit);
         }
 
         ///<summary>
@@ -146,8 +142,7 @@ namespace QuantityMeasurementApp.Core.Models
         /// </summary>
         private double ConvertToBaseUnit(double value, LengthUnit unit)
         {
-            double conversionFactor = _converter.GetConversionFactor(unit);
-            return value * conversionFactor;
+            return unit.ConvertToBaseUnit(value);
         }
 
         ///<summary>
