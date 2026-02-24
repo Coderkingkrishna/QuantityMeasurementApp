@@ -149,7 +149,7 @@ Instead of only checking equality, the app now converts values between supported
 ### Description
 
 UC6 extends UC5 by adding arithmetic support for length values.
-Two measurements can be added even when units differ, and the result can be returned in either the first operand unit or an explicitly provided target unit.
+Two measurements can be added even when units differ, and by default the result is returned in the unit of the first operand.
 
 ### Problem Solved
 
@@ -178,6 +178,40 @@ Two measurements can be added even when units differ, and the result can be retu
 - Identity behavior with zero
 - Floating-point precision handling with epsilon tolerance
 - Input validation and defensive error handling
+
+---
+
+## 🚀 Use Case 7 (UC7) – Addition with Target Unit Specification
+
+### Description
+
+UC7 extends UC6 by allowing the caller to explicitly provide a target unit for the addition result.
+The operation still adds values through a common base-unit path, but the final output unit is always the requested target unit.
+
+### Problem Solved
+
+- Decouples result representation from operand units.
+- Supports flexible output in FEET, INCHES, YARDS, or CENTIMETERS for the same arithmetic operation.
+- Preserves immutability by returning a new `QuantityLength` instance.
+
+---
+
+## ✅ Features Implemented in UC7
+
+- `QuantityLength.Add(QuantityLength other, LengthUnit targetUnit)`
+- `QuantityLength.Add(double value, LengthUnit unit, LengthUnit targetUnit)`
+- Service overloads for explicit target unit in `QuantityMeasurementService`
+- Validation for invalid/unsupported target unit values
+- UC7-focused tests added to `UnitAdditionTests.cs`
+
+---
+
+## 🧠 Concepts Demonstrated in UC7
+
+- Explicit parameterized result unit
+- Commutativity with a fixed target unit
+- Mathematical equivalence across different target representations
+- Edge-case support (zero, negative, cross-scale values)
 
 ---
 
@@ -301,6 +335,20 @@ Output: Quantity(24.0, Inches)
 
 Input: add(1.0, Yards, 3.0, Feet, Yards)
 Output: Quantity(2.0, Yards)
+
+UC7 Examples:
+
+Input: add(Quantity(1.0, Feet), Quantity(12.0, Inches), Feet)
+Output: Quantity(2.0, Feet)
+
+Input: add(Quantity(1.0, Feet), Quantity(12.0, Inches), Inches)
+Output: Quantity(24.0, Inches)
+
+Input: add(Quantity(1.0, Feet), Quantity(12.0, Inches), Yards)
+Output: Quantity(0.666..., Yards)
+
+Input: add(Quantity(36.0, Inches), Quantity(1.0, Yards), Feet)
+Output: Quantity(6.0, Feet)
 
 ---
 
