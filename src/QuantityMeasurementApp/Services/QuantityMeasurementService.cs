@@ -51,6 +51,14 @@ namespace QuantityMeasurementApp.Core.Services
         }
 
         /// <summary>
+        /// Compares two QuantityWeight measurements for equality, supporting cross-unit comparison.
+        /// </summary>
+        public bool AreEqual(QuantityWeight firstMeasurement, QuantityWeight secondMeasurement)
+        {
+            return firstMeasurement.Equals(secondMeasurement);
+        }
+
+        /// <summary>
         /// Converts a measurement from a source unit to a target unit using the QuantityLength class for conversion.
         /// </summary>
         /// <param name="value">The value to convert.</param>
@@ -58,6 +66,15 @@ namespace QuantityMeasurementApp.Core.Services
         public double Convert(double value, LengthUnit sourceUnit, LengthUnit targetUnit)
         {
             var quantity = new QuantityLength(value, sourceUnit);
+            return quantity.ConvertTo(targetUnit);
+        }
+
+        /// <summary>
+        /// Converts a weight measurement from a source unit to a target unit.
+        /// </summary>
+        public double Convert(double value, WeightUnit sourceUnit, WeightUnit targetUnit)
+        {
+            var quantity = new QuantityWeight(value, sourceUnit);
             return quantity.ConvertTo(targetUnit);
         }
 
@@ -76,6 +93,20 @@ namespace QuantityMeasurementApp.Core.Services
             return firstMeasurement.Add(secondMeasurement);
         }
 
+        /// <summary>
+        /// Adds two QuantityWeight measurements together and returns result in first operand's unit.
+        /// </summary>
+        public QuantityWeight Add(QuantityWeight firstMeasurement, QuantityWeight secondMeasurement)
+        {
+            if (firstMeasurement is null)
+                throw new ArgumentNullException(nameof(firstMeasurement));
+
+            if (secondMeasurement is null)
+                throw new ArgumentNullException(nameof(secondMeasurement));
+
+            return firstMeasurement.Add(secondMeasurement);
+        }
+
         ///<summary>
         /// Adds two QuantityLength measurements together, supporting cross-unit addition and allowing the caller to specify the target unit for the result.
         /// This method converts both measurements to the specified target unit, performs the addition, and returns the result as a new QuantityLength instance in the target unit.
@@ -84,6 +115,24 @@ namespace QuantityMeasurementApp.Core.Services
             QuantityLength firstMeasurement,
             QuantityLength secondMeasurement,
             LengthUnit targetUnit
+        )
+        {
+            if (firstMeasurement is null)
+                throw new ArgumentNullException(nameof(firstMeasurement));
+
+            if (secondMeasurement is null)
+                throw new ArgumentNullException(nameof(secondMeasurement));
+
+            return firstMeasurement.Add(secondMeasurement, targetUnit);
+        }
+
+        /// <summary>
+        /// Adds two QuantityWeight measurements together and returns result in specified target unit.
+        /// </summary>
+        public QuantityWeight Add(
+            QuantityWeight firstMeasurement,
+            QuantityWeight secondMeasurement,
+            WeightUnit targetUnit
         )
         {
             if (firstMeasurement is null)
@@ -116,6 +165,20 @@ namespace QuantityMeasurementApp.Core.Services
         }
 
         /// <summary>
+        /// Adds two weight measurements together.
+        /// </summary>
+        public QuantityWeight Add(
+            double firstValue,
+            WeightUnit firstUnit,
+            double secondValue,
+            WeightUnit secondUnit
+        )
+        {
+            var firstMeasurement = new QuantityWeight(firstValue, firstUnit);
+            return firstMeasurement.Add(secondValue, secondUnit);
+        }
+
+        /// <summary>
         /// Adds two measurements together, supporting cross-unit addition and allowing the caller to specify the target unit for the result.
         /// This method creates QuantityLength instances for both measurements, performs the addition using the Add method of QuantityLength, and returns the result as a new QuantityLength instance in the specified target unit.
         /// </summary>
@@ -128,6 +191,21 @@ namespace QuantityMeasurementApp.Core.Services
         )
         {
             var firstMeasurement = new QuantityLength(firstValue, firstUnit);
+            return firstMeasurement.Add(secondValue, secondUnit, targetUnit);
+        }
+
+        /// <summary>
+        /// Adds two weight measurements together and returns result in specified target unit.
+        /// </summary>
+        public QuantityWeight Add(
+            double firstValue,
+            WeightUnit firstUnit,
+            double secondValue,
+            WeightUnit secondUnit,
+            WeightUnit targetUnit
+        )
+        {
+            var firstMeasurement = new QuantityWeight(firstValue, firstUnit);
             return firstMeasurement.Add(secondValue, secondUnit, targetUnit);
         }
     }

@@ -1,0 +1,64 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuantityMeasurementApp.Core.Models;
+using QuantityMeasurementApp.Core.Services;
+
+namespace QuantityMeasurementApp.Tests
+{
+    [TestClass]
+    public class WeightUnitConversionTests
+    {
+        private const double Epsilon = 1e-6;
+
+        [TestMethod]
+        public void Convert_KilogramToGram_ReturnsExpectedValue()
+        {
+            var service = new QuantityMeasurementService();
+
+            var result = service.Convert(1.0, WeightUnit.Kilogram, WeightUnit.Gram);
+
+            Assert.AreEqual(1000.0, result, Epsilon);
+        }
+
+        [TestMethod]
+        public void Convert_PoundToKilogram_ReturnsExpectedValue()
+        {
+            var service = new QuantityMeasurementService();
+
+            var result = service.Convert(2.0, WeightUnit.Pound, WeightUnit.Kilogram);
+
+            Assert.AreEqual(0.907184, result, Epsilon);
+        }
+
+        [TestMethod]
+        public void Convert_GramToPound_ReturnsExpectedValue()
+        {
+            var service = new QuantityMeasurementService();
+
+            var result = service.Convert(500.0, WeightUnit.Gram, WeightUnit.Pound);
+
+            Assert.AreEqual(1.1023122100918888, result, Epsilon);
+        }
+
+        [TestMethod]
+        public void Convert_RoundTrip_PreservesValueWithinTolerance()
+        {
+            var service = new QuantityMeasurementService();
+            const double value = 1.5;
+
+            var grams = service.Convert(value, WeightUnit.Kilogram, WeightUnit.Gram);
+            var roundTrip = service.Convert(grams, WeightUnit.Gram, WeightUnit.Kilogram);
+
+            Assert.AreEqual(value, roundTrip, Epsilon);
+        }
+
+        [TestMethod]
+        public void Convert_InvalidTargetUnit_ThrowsArgumentException()
+        {
+            var service = new QuantityMeasurementService();
+
+            Assert.ThrowsException<ArgumentException>(() =>
+                service.Convert(1.0, WeightUnit.Kilogram, (WeightUnit)999)
+            );
+        }
+    }
+}
