@@ -18,6 +18,9 @@ namespace QuantityMeasurementApp.Tests
     /// </summary>
     // Unit tests for the Feet class to verify the equality comparison logic
     [TestClass]
+    /// <remarks>
+    /// Preserves UC1 expectations for the original value object behavior.
+    /// </remarks>
     public class FeetTests
     {
         // Test to verify that two Feet instances with the same value are considered equal

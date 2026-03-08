@@ -3,14 +3,54 @@ using System;
 namespace QuantityMeasurementApp.Core.Models
 {
     /// <summary>
-    /// The QuantityLength class represents a measurement with a value and a LengthUnit.
-    /// It eliminates code duplication by consolidating the functionality of Feet and Inches classes.
-    /// It implements the IEquatable interface to provide type-specific equality comparison.
-    /// The class supports conversion between different units before comparison, applying the DRY principle.
+    /// Internal abstraction used to compare quantities across generic instances by base-unit value and unit category.
     /// </summary>
-    public sealed class QuantityLength : IEquatable<QuantityLength>
+    internal interface IQuantityComparable
     {
-        private const double Epsilon = 1e-9;
+        Type UnitType { get; }
+
+        double BaseValue { get; }
+    }
+
+    /// <summary>
+    /// Resolves supported unit enums to their <see cref="IMeasurable"/> adapters.
+    /// </summary>
+    internal static class MeasurableResolver
+    {
+        public static bool TryResolve<U>(U unit, out IMeasurable measurable)
+            where U : struct, Enum
+        {
+            measurable = default!;
+
+            if (!Enum.IsDefined(typeof(U), unit))
+            {
+                return false;
+            }
+
+            if (unit is LengthUnit lengthUnit)
+            {
+                measurable = lengthUnit.AsMeasurable();
+                return true;
+            }
+
+            if (unit is WeightUnit weightUnit)
+            {
+                measurable = weightUnit.AsMeasurable();
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Generic immutable quantity model for UC10.
+    /// Centralizes equality, conversion, and addition logic for any supported unit category.
+    /// </summary>
+    public sealed class Quantity<U> : IEquatable<Quantity<U>>, IQuantityComparable
+        where U : struct, Enum
+    {
+        private const double Epsilon = 1e-6;
 
         /// <summary>
         /// Gets the value of the quantity.
@@ -18,137 +58,116 @@ namespace QuantityMeasurementApp.Core.Models
         public double Value { get; }
 
         /// <summary>
-        /// Gets the unit of the quantity.
-        /// </summary>
-        public LengthUnit Unit { get; }
+        public U Unit { get; }
 
         /// <summary>
-        /// Initializes a new instance of the QuantityLength class with the specified value and unit.
-        /// The constructor validates that the value is a finite number and that the unit is a defined LengthUnit.
-        /// If the value is not finite or the unit is not supported, an ArgumentException is thrown.
-        /// This ensures that the QuantityLength instances are always in a valid state, preventing issues during comparisons and conversions.
-        ///</summary>
-        public QuantityLength(double value, LengthUnit unit)
+        public Quantity(double value, U unit)
         {
             if (!double.IsFinite(value))
                 throw new ArgumentException("Value must be a finite number.", nameof(value));
 
-            if (!Enum.IsDefined(typeof(LengthUnit), unit))
+            if (!MeasurableResolver.TryResolve(unit, out _))
                 throw new ArgumentException($"Unsupported unit: {unit}", nameof(unit));
 
             Value = value;
             Unit = unit;
         }
 
-        ///<summary>
-        /// Compares this QuantityLength instance with another for equality, supporting cross-unit comparison.
-        /// The method converts both measurements to a common base unit (feet) before comparing their values.
-        /// </summary>
-        public bool Equals(QuantityLength? other)
+        private IMeasurable ResolveMeasurable(U unit)
+        {
+            if (!MeasurableResolver.TryResolve(unit, out var measurable))
+                throw new ArgumentException($"Unsupported unit: {unit}", nameof(unit));
+
+            return measurable;
+        }
+
+        public bool Equals(Quantity<U>? other)
         {
             if (ReferenceEquals(null, other))
                 return false;
 
-            if (ReferenceEquals(this, other))
-                return true;
-
-            double thisValueInBaseUnit = ConvertToBaseUnit(this.Value, this.Unit);
-            double otherValueInBaseUnit = ConvertToBaseUnit(other.Value, other.Unit);
-
-            return Math.Abs(thisValueInBaseUnit - otherValueInBaseUnit) < Epsilon;
+            return Equals((object)other);
         }
 
         public override bool Equals(object? obj)
         {
-            if (obj is not QuantityLength other)
+            if (ReferenceEquals(this, obj))
+                return true;
+
+            if (obj is not IQuantityComparable other)
                 return false;
 
-            return Equals(other);
+            if (Unit.GetType() != other.UnitType)
+                return false;
+
+            return Math.Abs(BaseValue - other.BaseValue) < Epsilon;
         }
 
-        ///<summary>
-        /// Returns the hash code for this instance.
-        /// The hash code is based on the value converted to the base unit (feet).
-        /// </summary>
         public override int GetHashCode()
         {
-            return ConvertToBaseUnit(Value, Unit).GetHashCode();
+            long normalized = (long)Math.Round(BaseValue / Epsilon, MidpointRounding.AwayFromZero);
+            return HashCode.Combine(Unit.GetType(), normalized);
         }
 
-        ///<summary>
-        /// Converts the quantity to the specified target unit.
-        /// The method first converts the value to the base unit (feet) and then converts it to the target unit using the conversion factor from the LengthUnitConverter.
-        /// </summary>
-        public double ConvertTo(LengthUnit targetUnit)
+        public Quantity<U> ConvertTo(U targetUnit)
         {
-            if (!Enum.IsDefined(typeof(LengthUnit), targetUnit))
+            if (!MeasurableResolver.TryResolve(targetUnit, out var targetMeasurable))
                 throw new ArgumentException($"Unsupported unit: {targetUnit}", nameof(targetUnit));
 
-            double valueInBaseUnit = Unit.ConvertToBaseUnit(Value);
-            return targetUnit.ConvertFromBaseUnit(valueInBaseUnit);
+            double valueInBaseUnit = ResolveMeasurable(Unit).ConvertToBaseUnit(Value);
+            double convertedValue = targetMeasurable.ConvertFromBaseUnit(valueInBaseUnit);
+
+            return new Quantity<U>(Math.Round(convertedValue, 2), targetUnit);
         }
 
-        ///<summary>
-        /// Converts the quantity to a new QuantityLength instance with the specified target unit.
-        /// </summary>
-        public QuantityLength ConvertToQuantity(LengthUnit targetUnit)
-        {
-            return new QuantityLength(ConvertTo(targetUnit), targetUnit);
-        }
-
-        ///<summary>
-        /// Adds another QuantityLength to this instance, supporting cross-unit addition.
-        /// The method converts the other measurement to the same unit as this instance, performs the addition, and returns a new QuantityLength instance with the result.
-        /// </summary>
-        public QuantityLength Add(QuantityLength other)
+        public Quantity<U> Add(Quantity<U> other)
         {
             if (other is null)
                 throw new ArgumentNullException(nameof(other));
 
-            double sumInCurrentUnit = Value + other.ConvertTo(Unit);
-            return new QuantityLength(sumInCurrentUnit, Unit);
+            return Add(other, Unit);
         }
 
-        public QuantityLength Add(QuantityLength other, LengthUnit targetUnit)
+        public Quantity<U> Add(Quantity<U> other, U targetUnit)
         {
             if (other is null)
                 throw new ArgumentNullException(nameof(other));
 
-            if (!Enum.IsDefined(typeof(LengthUnit), targetUnit))
+            if (!MeasurableResolver.TryResolve(targetUnit, out var targetMeasurable))
                 throw new ArgumentException($"Unsupported unit: {targetUnit}", nameof(targetUnit));
 
-            double sumInTargetUnit = ConvertTo(targetUnit) + other.ConvertTo(targetUnit);
-            return new QuantityLength(sumInTargetUnit, targetUnit);
+            double thisValueInBase = ResolveMeasurable(Unit).ConvertToBaseUnit(Value);
+            double otherValueInBase = other
+                .ResolveMeasurable(other.Unit)
+                .ConvertToBaseUnit(other.Value);
+            double sumInTargetUnit = targetMeasurable.ConvertFromBaseUnit(
+                thisValueInBase + otherValueInBase
+            );
+
+            return new Quantity<U>(Math.Round(sumInTargetUnit, 2), targetUnit);
         }
 
-        ///<summary>
-        /// Adds a measurement specified by a value and unit to this instance, supporting cross-unit addition
-        /// The method creates a QuantityLength instance for the other measurement, performs the addition using the Add method, and returns a new QuantityLength instance with the result.
-        /// </summary>
-        public QuantityLength Add(double value, LengthUnit unit)
+        public Quantity<U> Add(double value, U unit)
         {
-            var other = new QuantityLength(value, unit);
+            var other = new Quantity<U>(value, unit);
             return Add(other);
         }
 
-        public QuantityLength Add(double value, LengthUnit unit, LengthUnit targetUnit)
+        public Quantity<U> Add(double value, U unit, U targetUnit)
         {
-            var other = new QuantityLength(value, unit);
+            var other = new Quantity<U>(value, unit);
             return Add(other, targetUnit);
         }
 
-        ///<summary>
-        /// Helper method to convert a value from a specified unit to the base unit (feet).
-        /// </summary>
-        private double ConvertToBaseUnit(double value, LengthUnit unit)
+        Type IQuantityComparable.UnitType => Unit.GetType();
+
+        double IQuantityComparable.BaseValue => BaseValue;
+
+        private double BaseValue
         {
-            return unit.ConvertToBaseUnit(value);
+            get { return ResolveMeasurable(Unit).ConvertToBaseUnit(Value); }
         }
 
-        ///<summary>
-        /// Compares this QuantityLength instance with another for equality, supporting cross-unit comparison.
-        /// The method converts both measurements to a common base unit (feet) before comparing their values.
-        /// </summary>
         public override string ToString()
         {
             return $"Quantity({Value}, {Unit})";

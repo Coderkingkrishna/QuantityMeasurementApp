@@ -4,6 +4,9 @@ using QuantityMeasurementApp.Core.Services;
 
 namespace QuantityMeasurementApp.Tests
 {
+    /// <summary>
+    /// Verifies same-unit and cross-unit addition behavior for weight quantities.
+    /// </summary>
     [TestClass]
     public class WeightUnitAdditionTests
     {
@@ -43,7 +46,7 @@ namespace QuantityMeasurementApp.Tests
                 WeightUnit.Kilogram
             );
 
-            Assert.AreEqual(4.409248840367555, result.Value, Epsilon);
+            Assert.AreEqual(4.41, result.Value, Epsilon);
             Assert.AreEqual(WeightUnit.Pound, result.Unit);
         }
 

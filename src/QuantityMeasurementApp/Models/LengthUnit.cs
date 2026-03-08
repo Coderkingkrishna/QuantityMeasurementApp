@@ -6,6 +6,9 @@ namespace QuantityMeasurementApp.Core.Models
     /// The LengthUnit enum represents different units of measurement for length.
     /// Each unit has a conversion factor relative to feet (the base unit).
     /// </summary>
+    /// <remarks>
+    /// Length units remain enum-based and are adapted to <see cref="IMeasurable"/> through extension methods.
+    /// </remarks>
     public enum LengthUnit
     {
         Feet,
@@ -18,8 +21,41 @@ namespace QuantityMeasurementApp.Core.Models
     /// Extension methods for LengthUnit that provide conversion responsibility
     /// to and from the base unit (feet).
     /// </summary>
+    /// <remarks>
+    /// These extensions form the UC10 bridge from enum values to the common measurement contract.
+    /// </remarks>
     public static class LengthUnitExtensions
     {
+        private sealed class LengthMeasurable : IMeasurable
+        {
+            private readonly LengthUnit unit;
+
+            public LengthMeasurable(LengthUnit unit)
+            {
+                this.unit = unit;
+            }
+
+            public double GetConversionFactor()
+            {
+                return unit.GetConversionFactor();
+            }
+
+            public double ConvertToBaseUnit(double value)
+            {
+                return unit.ConvertToBaseUnit(value);
+            }
+
+            public double ConvertFromBaseUnit(double baseValue)
+            {
+                return unit.ConvertFromBaseUnit(baseValue);
+            }
+
+            public string GetUnitName()
+            {
+                return unit.GetUnitName();
+            }
+        }
+
         /// <summary>
         /// Gets the conversion factor for a given LengthUnit relative to feet (the base unit).
         /// This method allows for easy conversion of different length units to a common base unit for comparison.
@@ -65,6 +101,16 @@ namespace QuantityMeasurementApp.Core.Models
         public static double ConvertFromBaseUnit(this LengthUnit unit, double baseValue)
         {
             return baseValue / unit.GetConversionFactor();
+        }
+
+        public static string GetUnitName(this LengthUnit unit)
+        {
+            return unit.ToString().ToUpperInvariant();
+        }
+
+        public static IMeasurable AsMeasurable(this LengthUnit unit)
+        {
+            return new LengthMeasurable(unit);
         }
     }
 }

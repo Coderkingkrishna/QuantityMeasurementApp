@@ -3,6 +3,9 @@ using QuantityMeasurementApp.Core.Models;
 
 namespace QuantityMeasurementApp.Tests
 {
+    /// <summary>
+    /// Validates weight conversion constants and base-unit transforms.
+    /// </summary>
     [TestClass]
     public class WeightUnitTests
     {

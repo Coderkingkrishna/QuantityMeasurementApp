@@ -7,6 +7,9 @@ namespace QuantityMeasurementApp.Core.Models
     /// it also provides a method to get the hash code of the feet value.
     /// It implements the IEquatable<Feet> interface to provide type-specific equality comparison.
     /// </summary>
+    /// <remarks>
+    /// Legacy UC1 value object retained for backward compatibility alongside the generic UC10 model.
+    /// </remarks>
     public sealed class Feet : IEquatable<Feet>
     {
         //to store the value of feet

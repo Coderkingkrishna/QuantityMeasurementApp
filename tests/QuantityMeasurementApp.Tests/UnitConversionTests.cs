@@ -4,6 +4,9 @@ using QuantityMeasurementApp.Core.Services;
 
 namespace QuantityMeasurementApp.Tests
 {
+    /// <summary>
+    /// Verifies conversion behavior through the service facade for length units.
+    /// </summary>
     [TestClass]
     public class UnitConversionTests
     {

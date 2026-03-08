@@ -7,6 +7,9 @@ namespace QuantityMeasurementApp.Core.Models
     /// it also provides a method to get the hash code of the inches value.
     /// It implements the IEquatable<Inches> interface to provide type-specific equality comparison.
     /// </summary>
+    /// <remarks>
+    /// Legacy UC2 value object retained so early use cases keep their API while UC10 is generic.
+    /// </remarks>
     public sealed class Inches : IEquatable<Inches>
     {
         //to store the value of inches

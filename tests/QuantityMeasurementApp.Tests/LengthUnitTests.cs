@@ -8,6 +8,9 @@ namespace QuantityMeasurementApp.Tests
     /// conversion responsibilities work correctly for conversion factors, conversion to base unit,
     /// and conversion from base unit.
     /// </summary>
+    /// <remarks>
+    /// Confirms enum-extension conversions used by generic UC10 quantity operations.
+    /// </remarks>
     [TestClass]
     public class LengthUnitTests
     {

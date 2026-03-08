@@ -4,6 +4,9 @@ using QuantityMeasurementApp.Core.Services;
 
 namespace QuantityMeasurementApp.Tests
 {
+    /// <summary>
+    /// Verifies weight category conversions through generic service methods.
+    /// </summary>
     [TestClass]
     public class WeightUnitConversionTests
     {
@@ -26,7 +29,7 @@ namespace QuantityMeasurementApp.Tests
 
             var result = service.Convert(2.0, WeightUnit.Pound, WeightUnit.Kilogram);
 
-            Assert.AreEqual(0.907184, result, Epsilon);
+            Assert.AreEqual(0.91, result, Epsilon);
         }
 
         [TestMethod]
@@ -36,7 +39,7 @@ namespace QuantityMeasurementApp.Tests
 
             var result = service.Convert(500.0, WeightUnit.Gram, WeightUnit.Pound);
 
-            Assert.AreEqual(1.1023122100918888, result, Epsilon);
+            Assert.AreEqual(1.10, result, Epsilon);
         }
 
         [TestMethod]

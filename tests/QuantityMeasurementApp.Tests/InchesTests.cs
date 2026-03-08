@@ -16,6 +16,9 @@ namespace QuantityMeasurementApp.Tests
     /// /// }
     /// </code>
     /// </summary>
+    /// <remarks>
+    /// Preserves UC2 expectations for the original inches value object behavior.
+    /// </remarks>
     [TestClass]
     public class InchesTests
     {

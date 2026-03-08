@@ -10,6 +10,9 @@ namespace QuantityMeasurementApp.Tests
     /// - Same-unit addition (e.g., feet + feet, inches + inches)
     /// - Cross-unit addition with various target units (e.g., feet + inches, yards + feet, centimeters + inches)
     /// </summary>
+    /// <remarks>
+    /// Includes rounding-aware assertions aligned with UC10 two-decimal result policy.
+    /// </remarks>
     [TestClass]
     // UC6 test coverage for same-unit and cross-unit addition behavior.
     public class UnitAdditionTests
@@ -158,7 +161,7 @@ namespace QuantityMeasurementApp.Tests
                 LengthUnit.Feet
             );
 
-            Assert.AreEqual(large + small, result.Value, Epsilon);
+            Assert.AreEqual(large, result.Value, Epsilon);
         }
 
         [TestMethod]
@@ -178,7 +181,7 @@ namespace QuantityMeasurementApp.Tests
         public void Addition_NullMeasurement_ThrowsArgumentNullException()
         {
             var service = new QuantityMeasurementService();
-            QuantityLength second = new QuantityLength(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> second = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
 
             Assert.ThrowsException<ArgumentNullException>(() =>
                 service.Add(null!, second, LengthUnit.Feet)
@@ -199,7 +202,7 @@ namespace QuantityMeasurementApp.Tests
                 LengthUnit.Yards
             );
 
-            Assert.AreEqual(2.0 / 3.0, result.Value, Epsilon);
+            Assert.AreEqual(0.67, result.Value, Epsilon);
             Assert.AreEqual(LengthUnit.Yards, result.Unit);
         }
 
@@ -285,7 +288,7 @@ namespace QuantityMeasurementApp.Tests
                 LengthUnit.Yards
             );
 
-            Assert.AreEqual(5.0 / 3.0, result.Value, Epsilon);
+            Assert.AreEqual(1.67, result.Value, Epsilon);
             Assert.AreEqual(LengthUnit.Yards, result.Unit);
         }
 
