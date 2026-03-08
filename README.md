@@ -366,6 +366,60 @@ It validates that the generic architecture from UC10 scales without changing cor
 
 ---
 
+   ## 🚀 Use Case 12 (UC12) – Subtraction and Division Operations
+
+   ### Description
+
+   UC12 extends the generic arithmetic model by adding:
+
+   - **Subtraction** between same-category quantities (`Quantity<U>`) with:
+      - implicit target unit (first operand unit)
+      - explicit target unit overload
+   - **Division** between same-category quantities returning a **dimensionless scalar** (`double`)
+
+   Both operations reuse the UC10–UC11 conversion pipeline (convert to base unit first), preserve immutability,
+   and keep category safety through generic typing.
+
+   ### ✅ Features Implemented in UC12
+
+   - `Quantity<U>.Subtract(Quantity<U> other)`
+   - `Quantity<U>.Subtract(Quantity<U> other, U targetUnit)`
+   - `Quantity<U>.Divide(Quantity<U> other)`
+   - Service facade overloads for subtraction and division in `QuantityMeasurementService`
+   - Program demonstrations for subtraction and division across:
+      - Length
+      - Weight
+      - Volume
+   - New UC12 unit test coverage for:
+      - same-unit and cross-unit subtraction/division
+      - explicit target unit subtraction
+      - negative and zero subtraction results
+      - non-commutativity checks
+      - division-by-zero handling
+      - null argument handling
+
+   ### 📌 UC12 Behavior Notes
+
+   - Subtraction result is rounded to **2 decimal places** and returned as a new `Quantity<U>`.
+   - Division returns raw ratio as `double` (no unit).
+   - Division by zero throws `ArithmeticException`.
+   - Cross-category arithmetic is prevented by compile-time generic constraints and runtime method signatures.
+
+   ### 🧪 UC12 Example Operations
+
+   - Subtraction (implicit target):
+      - `Quantity(10.0, Feet).Subtract(Quantity(6.0, Inches))` → `Quantity(9.5, Feet)`
+      - `Quantity(10.0, Kilogram).Subtract(Quantity(5000.0, Gram))` → `Quantity(5.0, Kilogram)`
+   - Subtraction (explicit target):
+      - `Quantity(10.0, Feet).Subtract(Quantity(6.0, Inches), Inches)` → `Quantity(114.0, Inches)`
+      - `Quantity(5.0, Litre).Subtract(Quantity(2.0, Litre), Millilitre)` → `Quantity(3000.0, Millilitre)`
+   - Division:
+      - `Quantity(24.0, Inches).Divide(Quantity(2.0, Feet))` → `1.0`
+      - `Quantity(2000.0, Gram).Divide(Quantity(1.0, Kilogram))` → `2.0`
+      - `Quantity(5.0, Litre).Divide(Quantity(10.0, Litre))` → `0.5`
+
+   ---
+
 ## 🛠 Tech Stack
 
 - .NET 8
@@ -405,12 +459,18 @@ tests/
     ├── QuantityWeightTests.cs
     ├── UnitConversionTests.cs
     ├── UnitAdditionTests.cs
+   ├── UnitSubtractionTests.cs
+   ├── UnitDivisionTests.cs
    ├── VolumeUnitTests.cs
    ├── VolumeUnitConversionTests.cs
    ├── VolumeUnitAdditionTests.cs
+   ├── VolumeUnitSubtractionTests.cs
+   ├── VolumeUnitDivisionTests.cs
    ├── WeightUnitTests.cs
    ├── WeightUnitConversionTests.cs
-   └── WeightUnitAdditionTests.cs
+   ├── WeightUnitAdditionTests.cs
+   ├── WeightUnitSubtractionTests.cs
+   └── WeightUnitDivisionTests.cs
 ```
 
 ## ▶ How to Run the Application
@@ -447,16 +507,25 @@ tests/
 Input: Quantity(1, Feet) and Quantity(12, Inches) -> Output: True
 Input: Quantity(1, Feet).ConvertTo(Inches) -> Output: Quantity(12, Inches)
 Input: Quantity(1, Feet).Add(Quantity(12, Inches), Feet) -> Output: Quantity(2, Feet)
+Input: Quantity(10, Feet).Subtract(Quantity(6, Inches)) -> Output: Quantity(9.5, Feet)
+Input: Quantity(10, Feet).Subtract(Quantity(6, Inches), Inches) -> Output: Quantity(114, Inches)
+Input: Quantity(24, Inches).Divide(Quantity(2, Feet)) -> Output: 1
 
 === Weight Operations ===
 Input: Quantity(1, Kilogram) and Quantity(1000, Gram) -> Output: True
 Input: Quantity(1, Kilogram).ConvertTo(Gram) -> Output: Quantity(1000, Gram)
 Input: Quantity(1, Kilogram).Add(Quantity(1000, Gram), Kilogram) -> Output: Quantity(2, Kilogram)
+Input: Quantity(10, Kilogram).Subtract(Quantity(5000, Gram)) -> Output: Quantity(5, Kilogram)
+Input: Quantity(10, Kilogram).Subtract(Quantity(5000, Gram), Gram) -> Output: Quantity(5000, Gram)
+Input: Quantity(10, Kilogram).Divide(Quantity(5, Kilogram)) -> Output: 2
 
 === Volume Operations ===
 Input: Quantity(1, Litre) and Quantity(1000, Millilitre) -> Output: True
 Input: Quantity(1, Gallon).ConvertTo(Litre) -> Output: Quantity(3.79, Litre)
 Input: Quantity(1, Litre).Add(Quantity(1, Gallon), Millilitre) -> Output: Quantity(4785.41, Millilitre)
+Input: Quantity(5, Litre).Subtract(Quantity(500, Millilitre)) -> Output: Quantity(4.5, Litre)
+Input: Quantity(5, Litre).Subtract(Quantity(2, Litre), Millilitre) -> Output: Quantity(3000, Millilitre)
+Input: Quantity(1000, Millilitre).Divide(Quantity(1, Litre)) -> Output: 1
 ```
 
 ---
