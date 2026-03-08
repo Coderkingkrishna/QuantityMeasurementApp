@@ -269,149 +269,6 @@ UC8 refactors unit conversion ownership by keeping `LengthUnit` as a standalone 
 
 ---
 
-## 🛠 Tech Stack
-
-- .NET 8
-- C#
-- MSTest
-- Git
-
----
-
-## 📂 Project Structure
-
-```text
-QuantityMeasurementApp.sln
-
-src/
-└── QuantityMeasurementApp
-    ├── Program.cs
-    ├── Models/
-    │   ├── Feet.cs
-    │   ├── Inches.cs
-    │   ├── LengthUnit.cs
-    │   └── Quantity.cs
-    └── Services/
-        └── QuantityMeasurementService.cs
-
-tests/
-└── QuantityMeasurementApp.Tests
-    ├── FeetTests.cs
-    ├── InchesTests.cs
-   ├── QuantityTests.cs
-   ├── UnitConversionTests.cs
-   ├── UnitAdditionTests.cs
-   └── LengthUnitTests.cs
-```
-## ▶ How to Run the Application
-
-1. Clone the repository:
-   git clone <repository-url>
-
-2. Navigate to the project folder:
-   cd QuantityMeasurementApp
-
-3. Build the project:
-   dotnet build
-
-4. Run the application:
-   cd src/QuantityMeasurementApp
-   dotnet run
-
-Expected Output:
-
-Input: 1.0 inch and 1.0 inch  
-Output: Equal (True)
-
-Input: 1.0 ft and 1.0 ft  
-Output: Equal (True)
-
-UC3 Example:
-
-Input: Quantity(1.0, Feet) and Quantity(12.0, Inches)
-Output: Equal (True)
-
-UC4 Examples:
-
-Input: Quantity(1.0, Yards) and Quantity(3.0, Feet)
-Output: Equal (True)
-
-Input: Quantity(1.0, Yards) and Quantity(36.0, Inches)
-Output: Equal (True)
-
-Input: Quantity(2.0, Centimeters) and Quantity(2.0, Centimeters)
-Output: Equal (True)
-
-Input: Quantity(1.0, Centimeters) and Quantity(0.393701, Inches)
-Output: Equal (True)
-
-UC5 Examples:
-
-Input: convert(1.0, Feet, Inches)
-Output: 12.0
-
-Input: convert(3.0, Yards, Feet)
-Output: 9.0
-
-Input: convert(36.0, Inches, Yards)
-Output: 1.0
-
-Input: convert(1.0, Centimeters, Inches)
-Output: 0.393700787...
-
-Input: convert(0.0, Feet, Inches)
-Output: 0.0
-
-UC6 Examples:
-
-Input: add(Quantity(1.0, Feet), Quantity(12.0, Inches))
-Output: Quantity(2.0, Feet)
-
-Input: add(12.0, Inches, 1.0, Feet, Inches)
-Output: Quantity(24.0, Inches)
-
-Input: add(1.0, Yards, 3.0, Feet, Yards)
-Output: Quantity(2.0, Yards)
-
-UC7 Examples:
-
-Input: add(Quantity(1.0, Feet), Quantity(12.0, Inches), Feet)
-Output: Quantity(2.0, Feet)
-
-Input: add(Quantity(1.0, Feet), Quantity(12.0, Inches), Inches)
-Output: Quantity(24.0, Inches)
-
-Input: add(Quantity(1.0, Feet), Quantity(12.0, Inches), Yards)
-Output: Quantity(0.666..., Yards)
-
-Input: add(Quantity(36.0, Inches), Quantity(1.0, Yards), Feet)
-Output: Quantity(6.0, Feet)
-
-UC8 Examples:
-
-Input: LengthUnit.Feet.ConvertToBaseUnit(12.0)
-Output: 12.0
-
-Input: LengthUnit.Inches.ConvertToBaseUnit(12.0)
-Output: 1.0
-
-Input: Quantity(1.0, Feet).convertTo(Inches)
-Output: Quantity(12.0, Inches)
-
-Input: Quantity(1.0, Feet).add(Quantity(12.0, Inches), Yards)
-Output: Quantity(0.666..., Yards)
-
----
-
-## 🧪 How to Run Unit Tests
-
-From solution root directory:
-
-dotnet test
-
-All test cases must pass before merging into develop or main branch.
-
----
 
 ## 🚀 Use Case 9 (UC9) – Weight Unit Support
 
@@ -465,13 +322,153 @@ are adapted to `IMeasurable` using extension-based wrappers (`AsMeasurable()`).
 
 ---
 
-## 📂 Current Structure Addendum (UC10)
+## 🚀 Use Case 11 (UC11) – Volume Measurement Equality, Conversion, and Addition
 
-The existing structure above remains valid; UC10 adds/uses these files:
+### Description
 
-- `src/QuantityMeasurementApp/Models/IMeasurable.cs`
-- `src/QuantityMeasurementApp/Models/WeightUnit.cs`
-- `tests/QuantityMeasurementApp.Tests/IMeasurableTests.cs`
-- `tests/QuantityMeasurementApp.Tests/WeightUnitTests.cs`
-- `tests/QuantityMeasurementApp.Tests/WeightUnitConversionTests.cs`
-- `tests/QuantityMeasurementApp.Tests/WeightUnitAdditionTests.cs`
+UC11 introduces a third measurement category: **volume**.
+It validates that the generic architecture from UC10 scales without changing core generic logic.
+
+### ✅ Features Implemented in UC11
+
+- New `VolumeUnit` enum with base unit **Litre**
+- Supported units:
+   - `Litre` → `1.0`
+   - `Millilitre` → `0.001`
+   - `Gallon` → `3.78541`
+- Volume conversion support via existing generic APIs
+- Volume addition support with:
+   - implicit target unit (first operand unit)
+   - explicit target unit
+- Cross-category isolation retained (`Volume` vs `Length`/`Weight` returns incompatible equality)
+
+### 📌 UC11 Behavior Notes
+
+- Equality is based on normalized base-unit values
+- `ConvertTo` and `Add` keep the shared UC10 rounding behavior (**2 decimal places**)
+- Existing UC1–UC10 functionality remains unaffected
+
+### 🧪 UC11 Example Operations
+
+- Equality:
+   - `Quantity(1.0, Litre)` == `Quantity(1000.0, Millilitre)` → `true`
+   - `Quantity(1.0, Gallon)` == `Quantity(3.78541, Litre)` → `true`
+
+- Conversion:
+   - `Quantity(1.0, Litre).ConvertTo(Millilitre)` → `Quantity(1000.0, Millilitre)`
+   - `Quantity(2.0, Gallon).ConvertTo(Litre)` → `Quantity(7.57, Litre)`
+   - `Quantity(500.0, Millilitre).ConvertTo(Gallon)` → `Quantity(0.13, Gallon)`
+
+- Addition:
+   - `Quantity(1.0, Litre).Add(Quantity(1000.0, Millilitre))` → `Quantity(2.0, Litre)`
+   - `Quantity(1.0, Litre).Add(Quantity(1000.0, Millilitre), Millilitre)` → `Quantity(2000.0, Millilitre)`
+   - `Quantity(500.0, Millilitre).Add(Quantity(1.0, Litre), Gallon)` → `Quantity(0.4, Gallon)`
+
+---
+
+## 🛠 Tech Stack
+
+- .NET 8
+- C#
+- MSTest
+- Git
+
+---
+
+## 📂 Project Structure
+
+```text
+QuantityMeasurementApp.sln
+
+src/
+└── QuantityMeasurementApp
+    ├── Program.cs
+    ├── Models/
+    │   ├── Feet.cs
+    │   ├── IMeasurable.cs
+    │   ├── Inches.cs
+    │   ├── LengthUnit.cs
+    │   ├── Quantity.cs
+    │   ├── VolumeUnit.cs
+    │   └── WeightUnit.cs
+    └── Services/
+        └── QuantityMeasurementService.cs
+
+tests/
+└── QuantityMeasurementApp.Tests
+    ├── FeetTests.cs
+    ├── IMeasurableTests.cs
+    ├── InchesTests.cs
+    ├── LengthUnitTests.cs
+    ├── QuantityTests.cs
+    ├── QuantityVolumeTests.cs
+    ├── QuantityWeightTests.cs
+    ├── UnitConversionTests.cs
+    ├── UnitAdditionTests.cs
+   ├── VolumeUnitTests.cs
+   ├── VolumeUnitConversionTests.cs
+   ├── VolumeUnitAdditionTests.cs
+   ├── WeightUnitTests.cs
+   ├── WeightUnitConversionTests.cs
+   └── WeightUnitAdditionTests.cs
+```
+
+## ▶ How to Run the Application
+
+1. Clone the repository:
+
+   ```bash
+   git clone <repository-url>
+   ```
+
+2. Navigate to the project folder:
+
+   ```bash
+   cd QuantityMeasurementApp
+   ```
+
+3. Build the project:
+
+   ```bash
+   dotnet build
+   ```
+
+4. Run the application:
+
+   ```bash
+   cd src/QuantityMeasurementApp
+   dotnet run
+   ```
+
+### Expected Output (Sample from `dotnet run`)
+
+```text
+=== Length Operations ===
+Input: Quantity(1, Feet) and Quantity(12, Inches) -> Output: True
+Input: Quantity(1, Feet).ConvertTo(Inches) -> Output: Quantity(12, Inches)
+Input: Quantity(1, Feet).Add(Quantity(12, Inches), Feet) -> Output: Quantity(2, Feet)
+
+=== Weight Operations ===
+Input: Quantity(1, Kilogram) and Quantity(1000, Gram) -> Output: True
+Input: Quantity(1, Kilogram).ConvertTo(Gram) -> Output: Quantity(1000, Gram)
+Input: Quantity(1, Kilogram).Add(Quantity(1000, Gram), Kilogram) -> Output: Quantity(2, Kilogram)
+
+=== Volume Operations ===
+Input: Quantity(1, Litre) and Quantity(1000, Millilitre) -> Output: True
+Input: Quantity(1, Gallon).ConvertTo(Litre) -> Output: Quantity(3.79, Litre)
+Input: Quantity(1, Litre).Add(Quantity(1, Gallon), Millilitre) -> Output: Quantity(4785.41, Millilitre)
+```
+
+---
+
+## 🧪 How to Run Unit Tests
+
+From solution root directory:
+
+```bash
+dotnet test
+```
+
+All test cases must pass before merging into develop or main branch.
+
+---
