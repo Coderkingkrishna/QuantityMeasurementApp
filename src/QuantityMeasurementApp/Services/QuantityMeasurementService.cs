@@ -48,6 +48,14 @@ namespace QuantityMeasurementApp.Core.Services
             return firstMeasurement.Equals(secondMeasurement);
         }
 
+        /// <summary>
+        /// Converts a primitive source value to the requested target unit.
+        /// </summary>
+        /// <typeparam name="U">The enum unit type.</typeparam>
+        /// <param name="value">The value to convert.</param>
+        /// <param name="sourceUnit">The source unit.</param>
+        /// <param name="targetUnit">The target unit.</param>
+        /// <returns>The converted value in the target unit.</returns>
         public double Convert<U>(double value, U sourceUnit, U targetUnit)
             where U : struct, Enum
         {
@@ -83,6 +91,15 @@ namespace QuantityMeasurementApp.Core.Services
             return firstMeasurement.Add(secondMeasurement, targetUnit);
         }
 
+        /// <summary>
+        /// Adds two primitive value/unit pairs and returns the result in the first operand unit.
+        /// </summary>
+        /// <typeparam name="U">The enum unit type.</typeparam>
+        /// <param name="firstValue">First value.</param>
+        /// <param name="firstUnit">First unit.</param>
+        /// <param name="secondValue">Second value.</param>
+        /// <param name="secondUnit">Second unit.</param>
+        /// <returns>The summed quantity.</returns>
         public Quantity<U> Add<U>(double firstValue, U firstUnit, double secondValue, U secondUnit)
             where U : struct, Enum
         {
@@ -90,6 +107,16 @@ namespace QuantityMeasurementApp.Core.Services
             return firstMeasurement.Add(secondValue, secondUnit);
         }
 
+        /// <summary>
+        /// Adds two primitive value/unit pairs and returns the result in an explicit target unit.
+        /// </summary>
+        /// <typeparam name="U">The enum unit type.</typeparam>
+        /// <param name="firstValue">First value.</param>
+        /// <param name="firstUnit">First unit.</param>
+        /// <param name="secondValue">Second value.</param>
+        /// <param name="secondUnit">Second unit.</param>
+        /// <param name="targetUnit">Target result unit.</param>
+        /// <returns>The summed quantity in <paramref name="targetUnit"/>.</returns>
         public Quantity<U> Add<U>(
             double firstValue,
             U firstUnit,
@@ -101,6 +128,129 @@ namespace QuantityMeasurementApp.Core.Services
         {
             var firstMeasurement = new Quantity<U>(firstValue, firstUnit);
             return firstMeasurement.Add(secondValue, secondUnit, targetUnit);
+        }
+
+        /// <summary>
+        /// Subtracts two quantities and returns the result in the first operand unit.
+        /// </summary>
+        /// <typeparam name="U">The enum unit type.</typeparam>
+        /// <param name="firstMeasurement">The minuend quantity.</param>
+        /// <param name="secondMeasurement">The subtrahend quantity.</param>
+        /// <returns>The difference quantity in the first operand unit.</returns>
+        public Quantity<U> Subtract<U>(Quantity<U> firstMeasurement, Quantity<U> secondMeasurement)
+            where U : struct, Enum
+        {
+            if (firstMeasurement is null)
+                throw new ArgumentNullException(nameof(firstMeasurement));
+
+            if (secondMeasurement is null)
+                throw new ArgumentNullException(nameof(secondMeasurement));
+
+            return firstMeasurement.Subtract(secondMeasurement);
+        }
+
+        /// <summary>
+        /// Subtracts two quantities and returns the result in an explicit target unit.
+        /// </summary>
+        /// <typeparam name="U">The enum unit type.</typeparam>
+        /// <param name="firstMeasurement">The minuend quantity.</param>
+        /// <param name="secondMeasurement">The subtrahend quantity.</param>
+        /// <param name="targetUnit">The target unit for the difference.</param>
+        /// <returns>The difference quantity in <paramref name="targetUnit"/>.</returns>
+        public Quantity<U> Subtract<U>(
+            Quantity<U> firstMeasurement,
+            Quantity<U> secondMeasurement,
+            U targetUnit
+        )
+            where U : struct, Enum
+        {
+            if (firstMeasurement is null)
+                throw new ArgumentNullException(nameof(firstMeasurement));
+
+            if (secondMeasurement is null)
+                throw new ArgumentNullException(nameof(secondMeasurement));
+
+            return firstMeasurement.Subtract(secondMeasurement, targetUnit);
+        }
+
+        /// <summary>
+        /// Subtracts two primitive value/unit pairs and returns the result in first operand unit.
+        /// </summary>
+        /// <typeparam name="U">The enum unit type.</typeparam>
+        /// <param name="firstValue">Minuend value.</param>
+        /// <param name="firstUnit">Minuend unit.</param>
+        /// <param name="secondValue">Subtrahend value.</param>
+        /// <param name="secondUnit">Subtrahend unit.</param>
+        /// <returns>The difference quantity.</returns>
+        public Quantity<U> Subtract<U>(
+            double firstValue,
+            U firstUnit,
+            double secondValue,
+            U secondUnit
+        )
+            where U : struct, Enum
+        {
+            var firstMeasurement = new Quantity<U>(firstValue, firstUnit);
+            return firstMeasurement.Subtract(new Quantity<U>(secondValue, secondUnit));
+        }
+
+        /// <summary>
+        /// Subtracts two primitive value/unit pairs and returns the result in an explicit target unit.
+        /// </summary>
+        /// <typeparam name="U">The enum unit type.</typeparam>
+        /// <param name="firstValue">Minuend value.</param>
+        /// <param name="firstUnit">Minuend unit.</param>
+        /// <param name="secondValue">Subtrahend value.</param>
+        /// <param name="secondUnit">Subtrahend unit.</param>
+        /// <param name="targetUnit">Target unit for the result.</param>
+        /// <returns>The difference quantity in <paramref name="targetUnit"/>.</returns>
+        public Quantity<U> Subtract<U>(
+            double firstValue,
+            U firstUnit,
+            double secondValue,
+            U secondUnit,
+            U targetUnit
+        )
+            where U : struct, Enum
+        {
+            var firstMeasurement = new Quantity<U>(firstValue, firstUnit);
+            return firstMeasurement.Subtract(new Quantity<U>(secondValue, secondUnit), targetUnit);
+        }
+
+        /// <summary>
+        /// Divides one quantity by another and returns a dimensionless ratio.
+        /// </summary>
+        /// <typeparam name="U">The enum unit type.</typeparam>
+        /// <param name="firstMeasurement">The dividend quantity.</param>
+        /// <param name="secondMeasurement">The divisor quantity.</param>
+        /// <returns>The scalar ratio.</returns>
+        public double Divide<U>(Quantity<U> firstMeasurement, Quantity<U> secondMeasurement)
+            where U : struct, Enum
+        {
+            if (firstMeasurement is null)
+                throw new ArgumentNullException(nameof(firstMeasurement));
+
+            if (secondMeasurement is null)
+                throw new ArgumentNullException(nameof(secondMeasurement));
+
+            return firstMeasurement.Divide(secondMeasurement);
+        }
+
+        /// <summary>
+        /// Divides primitive value/unit pairs and returns a dimensionless ratio.
+        /// </summary>
+        /// <typeparam name="U">The enum unit type.</typeparam>
+        /// <param name="firstValue">Dividend value.</param>
+        /// <param name="firstUnit">Dividend unit.</param>
+        /// <param name="secondValue">Divisor value.</param>
+        /// <param name="secondUnit">Divisor unit.</param>
+        /// <returns>The scalar ratio.</returns>
+        public double Divide<U>(double firstValue, U firstUnit, double secondValue, U secondUnit)
+            where U : struct, Enum
+        {
+            var firstMeasurement = new Quantity<U>(firstValue, firstUnit);
+            var secondMeasurement = new Quantity<U>(secondValue, secondUnit);
+            return firstMeasurement.Divide(secondMeasurement);
         }
     }
 }
