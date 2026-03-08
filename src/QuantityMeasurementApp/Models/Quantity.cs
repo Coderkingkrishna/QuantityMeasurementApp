@@ -39,6 +39,12 @@ namespace QuantityMeasurementApp.Core.Models
                 return true;
             }
 
+            if (unit is VolumeUnit volumeUnit)
+            {
+                measurable = volumeUnit.AsMeasurable();
+                return true;
+            }
+
             return false;
         }
     }

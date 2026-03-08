@@ -93,6 +93,25 @@ namespace QuantityMeasurementApp
                     new Quantity<WeightUnit>(1000.0, WeightUnit.Gram),
                     WeightUnit.Kilogram
                 );
+
+                Console.WriteLine();
+                Console.WriteLine("=== Volume Operations ===");
+                DemonstrateEquality(
+                    quantityMeasurementService,
+                    new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre),
+                    new Quantity<VolumeUnit>(1000.0, VolumeUnit.Millilitre)
+                );
+                DemonstrateConversion(
+                    quantityMeasurementService,
+                    new Quantity<VolumeUnit>(1.0, VolumeUnit.Gallon),
+                    VolumeUnit.Litre
+                );
+                DemonstrateAddition(
+                    quantityMeasurementService,
+                    new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre),
+                    new Quantity<VolumeUnit>(1.0, VolumeUnit.Gallon),
+                    VolumeUnit.Millilitre
+                );
             }
             catch (Exception exception)
             {
