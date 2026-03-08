@@ -412,3 +412,66 @@ dotnet test
 All test cases must pass before merging into develop or main branch.
 
 ---
+
+## 🚀 Use Case 9 (UC9) – Weight Unit Support
+
+### Description
+
+UC9 extends the application to a second measurement category: **weight**.
+This proves the conversion/addition/equality flow can work beyond length.
+
+### ✅ Features Implemented in UC9
+
+- `WeightUnit` with conversion factors (base unit: kilogram)
+- Weight conversion support via service APIs
+- Weight addition support (same-unit and cross-unit)
+- Weight-focused tests:
+   - `WeightUnitTests.cs`
+   - `WeightUnitConversionTests.cs`
+   - `WeightUnitAdditionTests.cs`
+   - `QuantityWeightTests.cs`
+
+---
+
+## 🚀 Use Case 10 (UC10) – Generic Quantity with Common Unit Contract
+
+### Description
+
+UC10 removes quantity-class duplication by introducing a single generic model:
+
+- `Quantity<U>` for value + unit operations
+- `IMeasurable` as common unit behavior contract
+
+In C#, enums cannot implement interfaces directly, so both `LengthUnit` and `WeightUnit`
+are adapted to `IMeasurable` using extension-based wrappers (`AsMeasurable()`).
+
+### ✅ Features Implemented in UC10
+
+- Generic immutable `Quantity<U>` replaces category-specific quantity models
+- Common conversion contract through `IMeasurable`
+- Unified generic service operations:
+   - `AreEqual<U>(...)`
+   - `Convert<U>(...)`
+   - `Add<U>(...)`
+- Runtime category-safety check in equality (length vs weight returns `false`)
+- Backward compatibility retained for legacy `Feet` / `Inches` UCs
+
+### 📌 UC10 Behavior Notes
+
+- Input validation rejects non-finite values and invalid enum values
+- Equality compares normalized base-unit values
+- `ConvertTo` and `Add` return values rounded to **2 decimal places**
+- Existing unit tests continue to pass with the generic architecture
+
+---
+
+## 📂 Current Structure Addendum (UC10)
+
+The existing structure above remains valid; UC10 adds/uses these files:
+
+- `src/QuantityMeasurementApp/Models/IMeasurable.cs`
+- `src/QuantityMeasurementApp/Models/WeightUnit.cs`
+- `tests/QuantityMeasurementApp.Tests/IMeasurableTests.cs`
+- `tests/QuantityMeasurementApp.Tests/WeightUnitTests.cs`
+- `tests/QuantityMeasurementApp.Tests/WeightUnitConversionTests.cs`
+- `tests/QuantityMeasurementApp.Tests/WeightUnitAdditionTests.cs`
