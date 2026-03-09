@@ -462,6 +462,36 @@ for validation, base-unit conversion, operation dispatch, and result projection.
 
 ---
 
+## 🚀 Use Case 14 (UC14) – Temperature Measurement with Selective Arithmetic Support
+
+### Description
+
+UC14 adds temperature support (`Celsius`, `Fahrenheit`, `Kelvin`) and refactors `IMeasurable` so arithmetic support is optional.
+Unlike length, weight, and volume, absolute temperatures do not support arithmetic operations in this model.
+
+### ✅ Features Implemented in UC14
+
+- New `TemperatureUnit` enum and measurable adapter with non-linear conversion formulas.
+- `IMeasurable` now includes optional operation-support defaults:
+   - `SupportsArithmetic()`
+   - `ValidateOperationSupport(string operation)`
+- `Quantity<U>` arithmetic flow validates operation support before add/subtract/divide execution.
+- Temperature conversions and equality work through base-unit normalization.
+- Temperature arithmetic (`Add`, `Subtract`, `Divide`) throws `NotSupportedException` with clear messages.
+
+### 📌 UC14 Behavior Notes
+
+- Existing UC1–UC13 behavior remains unchanged for length, weight, and volume.
+- Temperature supports equality and conversion only.
+- Cross-category safety remains intact through generic typing and runtime unit-category checks.
+
+### 🧪 UC14 Validation Coverage
+
+- `TemperatureUnitTests.cs` validates equality, conversion formulas, absolute-zero, and edge points.
+- `TemperatureUnsupportedOperationsTests.cs` validates unsupported arithmetic and capability flags.
+
+---
+
 ## 🛠 Tech Stack
 
 - .NET 8
@@ -485,6 +515,7 @@ src/
     │   ├── Inches.cs
     │   ├── LengthUnit.cs
     │   ├── Quantity.cs
+   │   ├── TemperatureUnit.cs
     │   ├── VolumeUnit.cs
     │   └── WeightUnit.cs
     └── Services/
@@ -498,6 +529,8 @@ tests/
     ├── LengthUnitTests.cs
     ├── QuantityTests.cs
    ├── QuantityUc13RefactorTests.cs
+   ├── TemperatureUnitTests.cs
+   ├── TemperatureUnsupportedOperationsTests.cs
     ├── QuantityVolumeTests.cs
     ├── QuantityWeightTests.cs
     ├── UnitConversionTests.cs
@@ -569,6 +602,14 @@ Input: Quantity(1, Litre).Add(Quantity(1, Gallon), Millilitre) -> Output: Quanti
 Input: Quantity(5, Litre).Subtract(Quantity(500, Millilitre)) -> Output: Quantity(4.5, Litre)
 Input: Quantity(5, Litre).Subtract(Quantity(2, Litre), Millilitre) -> Output: Quantity(3000, Millilitre)
 Input: Quantity(1000, Millilitre).Divide(Quantity(1, Litre)) -> Output: 1
+
+=== Temperature Operations ===
+Input: Quantity(0, Celsius) and Quantity(32, Fahrenheit) -> Output: True
+Input: Quantity(273.15, Kelvin) and Quantity(0, Celsius) -> Output: True
+Input: Quantity(100, Celsius).ConvertTo(Fahrenheit) -> Output: Quantity(212, Fahrenheit)
+Input: Quantity(273.15, Kelvin).ConvertTo(Celsius) -> Output: Quantity(0, Celsius)
+Input: Quantity(100, Celsius).Add(Quantity(50, Celsius)) -> Error: Temperature does not support Add operation for absolute values.
+Input: Quantity(100, Celsius).Divide(Quantity(50, Celsius)) -> Error: Temperature does not support Divide operation for absolute values.
 ```
 
 ---

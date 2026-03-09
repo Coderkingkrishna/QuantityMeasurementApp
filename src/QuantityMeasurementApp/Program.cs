@@ -245,6 +245,60 @@ namespace QuantityMeasurementApp
                     new Quantity<VolumeUnit>(1000.0, VolumeUnit.Millilitre),
                     new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre)
                 );
+
+                Console.WriteLine();
+                Console.WriteLine("=== Temperature Operations ===");
+                DemonstrateEquality(
+                    quantityMeasurementService,
+                    new Quantity<TemperatureUnit>(0.0, TemperatureUnit.Celsius),
+                    new Quantity<TemperatureUnit>(32.0, TemperatureUnit.Fahrenheit)
+                );
+                DemonstrateEquality(
+                    quantityMeasurementService,
+                    new Quantity<TemperatureUnit>(273.15, TemperatureUnit.Kelvin),
+                    new Quantity<TemperatureUnit>(0.0, TemperatureUnit.Celsius)
+                );
+                DemonstrateConversion(
+                    quantityMeasurementService,
+                    new Quantity<TemperatureUnit>(100.0, TemperatureUnit.Celsius),
+                    TemperatureUnit.Fahrenheit
+                );
+                DemonstrateConversion(
+                    quantityMeasurementService,
+                    new Quantity<TemperatureUnit>(273.15, TemperatureUnit.Kelvin),
+                    TemperatureUnit.Celsius
+                );
+
+                try
+                {
+                    DemonstrateAddition(
+                        quantityMeasurementService,
+                        new Quantity<TemperatureUnit>(100.0, TemperatureUnit.Celsius),
+                        new Quantity<TemperatureUnit>(50.0, TemperatureUnit.Celsius),
+                        TemperatureUnit.Celsius
+                    );
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(
+                        $"Input: Quantity(100, Celsius).Add(Quantity(50, Celsius)) -> Error: {exception.Message}"
+                    );
+                }
+
+                try
+                {
+                    DemonstrateDivision(
+                        quantityMeasurementService,
+                        new Quantity<TemperatureUnit>(100.0, TemperatureUnit.Celsius),
+                        new Quantity<TemperatureUnit>(50.0, TemperatureUnit.Celsius)
+                    );
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(
+                        $"Input: Quantity(100, Celsius).Divide(Quantity(50, Celsius)) -> Error: {exception.Message}"
+                    );
+                }
             }
             catch (Exception exception)
             {

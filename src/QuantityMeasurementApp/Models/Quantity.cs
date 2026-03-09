@@ -52,6 +52,12 @@ namespace QuantityMeasurementApp.Core.Models
                 return true;
             }
 
+            if (unit is TemperatureUnit temperatureUnit)
+            {
+                measurable = temperatureUnit.AsMeasurable();
+                return true;
+            }
+
             return false;
         }
     }
@@ -199,7 +205,12 @@ namespace QuantityMeasurementApp.Core.Models
         /// <exception cref="ArgumentException">Thrown when the target unit is unsupported.</exception>
         public Quantity<U> Add(Quantity<U> other, U targetUnit)
         {
-            ValidateArithmeticOperands(other, targetUnit, targetUnitRequired: true);
+            ValidateArithmeticOperands(
+                other,
+                targetUnit,
+                targetUnitRequired: true,
+                operation: ArithmeticOperation.Add
+            );
 
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.Add);
             return ConvertBaseResultToQuantity(baseResult, targetUnit);
@@ -251,7 +262,12 @@ namespace QuantityMeasurementApp.Core.Models
         /// <exception cref="ArgumentException">Thrown when target unit is unsupported.</exception>
         public Quantity<U> Subtract(Quantity<U> other, U targetUnit)
         {
-            ValidateArithmeticOperands(other, targetUnit, targetUnitRequired: true);
+            ValidateArithmeticOperands(
+                other,
+                targetUnit,
+                targetUnitRequired: true,
+                operation: ArithmeticOperation.Subtract
+            );
 
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.Subtract);
             return ConvertBaseResultToQuantity(baseResult, targetUnit);
@@ -266,7 +282,12 @@ namespace QuantityMeasurementApp.Core.Models
         /// <exception cref="ArithmeticException">Thrown when divisor resolves to zero.</exception>
         public double Divide(Quantity<U> other)
         {
-            ValidateArithmeticOperands(other, null, targetUnitRequired: false);
+            ValidateArithmeticOperands(
+                other,
+                null,
+                targetUnitRequired: false,
+                operation: ArithmeticOperation.Divide
+            );
             return PerformBaseArithmetic(other, ArithmeticOperation.Divide);
         }
 
@@ -281,7 +302,8 @@ namespace QuantityMeasurementApp.Core.Models
         private void ValidateArithmeticOperands(
             Quantity<U> other,
             U? targetUnit,
-            bool targetUnitRequired
+            bool targetUnitRequired,
+            ArithmeticOperation operation
         )
         {
             if (other is null)
@@ -295,6 +317,9 @@ namespace QuantityMeasurementApp.Core.Models
 
             ValidateFiniteQuantity(this, nameof(Value));
             ValidateFiniteQuantity(other, nameof(other));
+
+            ResolveMeasurable(Unit).ValidateOperationSupport(operation.ToString());
+            other.ResolveMeasurable(other.Unit).ValidateOperationSupport(operation.ToString());
 
             if (!targetUnitRequired)
                 return;
