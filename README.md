@@ -420,6 +420,48 @@ It validates that the generic architecture from UC10 scales without changing cor
 
    ---
 
+## 🚀 Use Case 13 (UC13) – Centralized Arithmetic Logic (DRY Refactor)
+
+### Description
+
+UC13 refactors internal arithmetic implementation in `Quantity<U>` to remove duplication across:
+
+- `Add(...)`
+- `Subtract(...)`
+- `Divide(...)`
+
+The public API and behavior remain unchanged from UC12. The refactor introduces a centralized arithmetic flow
+for validation, base-unit conversion, operation dispatch, and result projection.
+
+### ✅ Features Implemented in UC13
+
+- Private `ArithmeticOperation` enum for operation dispatch (`Add`, `Subtract`, `Divide`)
+- Centralized validation helper:
+   - null operand validation
+   - category/type compatibility guard
+   - finite numeric validation
+   - target unit validation (for add/subtract)
+- Centralized base arithmetic helper to compute add/subtract/divide in base-unit space
+- Shared conversion helper for add/subtract result projection to target unit
+- Dedicated divide-by-zero guard reused by division flow
+
+### 📌 UC13 Behavior Notes
+
+- Public method signatures are unchanged.
+- `Add` and `Subtract` still return rounded `Quantity<U>` values (2 decimals).
+- `Divide` still returns a raw dimensionless `double`.
+- Existing UC12 behavior is preserved; implementation is now DRY and easier to extend.
+
+### 🧪 UC13 Validation Coverage
+
+- Existing UC12 tests continue to pass without API-level changes.
+- Additional UC13 regression tests in `QuantityUc13RefactorTests.cs` verify:
+   - unchanged arithmetic results
+   - consistent null-operand handling across operations
+   - division-by-zero behavior remains fail-fast
+
+---
+
 ## 🛠 Tech Stack
 
 - .NET 8
@@ -455,6 +497,7 @@ tests/
     ├── InchesTests.cs
     ├── LengthUnitTests.cs
     ├── QuantityTests.cs
+   ├── QuantityUc13RefactorTests.cs
     ├── QuantityVolumeTests.cs
     ├── QuantityWeightTests.cs
     ├── UnitConversionTests.cs

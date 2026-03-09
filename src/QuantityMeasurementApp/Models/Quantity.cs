@@ -66,6 +66,16 @@ namespace QuantityMeasurementApp.Core.Models
         private const double Epsilon = 1e-6;
 
         /// <summary>
+        /// Supported arithmetic operations for centralized base-unit computation.
+        /// </summary>
+        private enum ArithmeticOperation
+        {
+            Add,
+            Subtract,
+            Divide,
+        }
+
+        /// <summary>
         /// Gets the value of the quantity.
         /// </summary>
         public double Value { get; }
@@ -176,9 +186,6 @@ namespace QuantityMeasurementApp.Core.Models
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="other"/> is null.</exception>
         public Quantity<U> Add(Quantity<U> other)
         {
-            if (other is null)
-                throw new ArgumentNullException(nameof(other));
-
             return Add(other, Unit);
         }
 
@@ -192,22 +199,10 @@ namespace QuantityMeasurementApp.Core.Models
         /// <exception cref="ArgumentException">Thrown when the target unit is unsupported.</exception>
         public Quantity<U> Add(Quantity<U> other, U targetUnit)
         {
-            if (other is null)
-                throw new ArgumentNullException(nameof(other));
+            ValidateArithmeticOperands(other, targetUnit, targetUnitRequired: true);
 
-            ValidateFiniteQuantity(other, nameof(other));
-
-            if (!MeasurableResolver.TryResolve(targetUnit, out var targetMeasurable))
-                throw new ArgumentException($"Unsupported unit: {targetUnit}", nameof(targetUnit));
-
-            double thisValueInBase = ResolveMeasurable(Unit).ConvertToBaseUnit(Value);
-            var otherMeasurable = other.ResolveMeasurable(other.Unit);
-            double otherValueInBase = otherMeasurable.ConvertToBaseUnit(other.Value);
-            double sumInTargetUnit = targetMeasurable.ConvertFromBaseUnit(
-                thisValueInBase + otherValueInBase
-            );
-
-            return new Quantity<U>(Math.Round(sumInTargetUnit, 2), targetUnit);
+            double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.Add);
+            return ConvertBaseResultToQuantity(baseResult, targetUnit);
         }
 
         /// <summary>
@@ -243,9 +238,6 @@ namespace QuantityMeasurementApp.Core.Models
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="other"/> is null.</exception>
         public Quantity<U> Subtract(Quantity<U> other)
         {
-            if (other is null)
-                throw new ArgumentNullException(nameof(other));
-
             return Subtract(other, Unit);
         }
 
@@ -259,22 +251,10 @@ namespace QuantityMeasurementApp.Core.Models
         /// <exception cref="ArgumentException">Thrown when target unit is unsupported.</exception>
         public Quantity<U> Subtract(Quantity<U> other, U targetUnit)
         {
-            if (other is null)
-                throw new ArgumentNullException(nameof(other));
+            ValidateArithmeticOperands(other, targetUnit, targetUnitRequired: true);
 
-            ValidateFiniteQuantity(other, nameof(other));
-
-            if (!MeasurableResolver.TryResolve(targetUnit, out var targetMeasurable))
-                throw new ArgumentException($"Unsupported unit: {targetUnit}", nameof(targetUnit));
-
-            double thisValueInBase = ResolveMeasurable(Unit).ConvertToBaseUnit(Value);
-            var otherMeasurable = other.ResolveMeasurable(other.Unit);
-            double otherValueInBase = otherMeasurable.ConvertToBaseUnit(other.Value);
-            double differenceInTargetUnit = targetMeasurable.ConvertFromBaseUnit(
-                thisValueInBase - otherValueInBase
-            );
-
-            return new Quantity<U>(Math.Round(differenceInTargetUnit, 2), targetUnit);
+            double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.Subtract);
+            return ConvertBaseResultToQuantity(baseResult, targetUnit);
         }
 
         /// <summary>
@@ -286,19 +266,97 @@ namespace QuantityMeasurementApp.Core.Models
         /// <exception cref="ArithmeticException">Thrown when divisor resolves to zero.</exception>
         public double Divide(Quantity<U> other)
         {
+            ValidateArithmeticOperands(other, null, targetUnitRequired: false);
+            return PerformBaseArithmetic(other, ArithmeticOperation.Divide);
+        }
+
+        /// <summary>
+        /// Validates arithmetic operands and optional target unit for centralized DRY enforcement.
+        /// </summary>
+        /// <param name="other">The secondary arithmetic operand.</param>
+        /// <param name="targetUnit">Optional target unit for result projection.</param>
+        /// <param name="targetUnitRequired">True when a target unit must be validated.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="other"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when values are invalid or target unit is unsupported.</exception>
+        private void ValidateArithmeticOperands(
+            Quantity<U> other,
+            U? targetUnit,
+            bool targetUnitRequired
+        )
+        {
             if (other is null)
                 throw new ArgumentNullException(nameof(other));
 
+            if (Unit.GetType() != other.Unit.GetType())
+                throw new ArgumentException(
+                    "Quantities must belong to the same measurement category.",
+                    nameof(other)
+                );
+
+            ValidateFiniteQuantity(this, nameof(Value));
             ValidateFiniteQuantity(other, nameof(other));
 
-            double thisValueInBase = ResolveMeasurable(Unit).ConvertToBaseUnit(Value);
-            var otherMeasurable = other.ResolveMeasurable(other.Unit);
-            double otherValueInBase = otherMeasurable.ConvertToBaseUnit(other.Value);
+            if (!targetUnitRequired)
+                return;
 
-            if (Math.Abs(otherValueInBase) < Epsilon)
+            if (!targetUnit.HasValue)
+                throw new ArgumentException("Target unit is required.", nameof(targetUnit));
+
+            if (!MeasurableResolver.TryResolve(targetUnit.Value, out _))
+                throw new ArgumentException(
+                    $"Unsupported unit: {targetUnit.Value}",
+                    nameof(targetUnit)
+                );
+        }
+
+        /// <summary>
+        /// Performs arithmetic in base-unit space for the provided operation.
+        /// </summary>
+        /// <param name="other">The secondary arithmetic operand.</param>
+        /// <param name="operation">The arithmetic operation to execute.</param>
+        /// <returns>The arithmetic result in base unit for add/subtract, or scalar for divide.</returns>
+        /// <exception cref="ArithmeticException">Thrown when dividing by zero quantity.</exception>
+        private double PerformBaseArithmetic(Quantity<U> other, ArithmeticOperation operation)
+        {
+            double thisValueInBase = ResolveMeasurable(Unit).ConvertToBaseUnit(Value);
+            double otherValueInBase = other
+                .ResolveMeasurable(other.Unit)
+                .ConvertToBaseUnit(other.Value);
+
+            return operation switch
+            {
+                ArithmeticOperation.Add => thisValueInBase + otherValueInBase,
+                ArithmeticOperation.Subtract => thisValueInBase - otherValueInBase,
+                ArithmeticOperation.Divide => DivideBaseValues(thisValueInBase, otherValueInBase),
+                _ => throw new InvalidOperationException($"Unsupported operation: {operation}"),
+            };
+        }
+
+        /// <summary>
+        /// Converts a base-unit arithmetic result to the specified target unit and creates a new quantity.
+        /// </summary>
+        /// <param name="baseResult">The arithmetic result in base unit.</param>
+        /// <param name="targetUnit">The target unit to project to.</param>
+        /// <returns>A rounded quantity in the target unit.</returns>
+        private Quantity<U> ConvertBaseResultToQuantity(double baseResult, U targetUnit)
+        {
+            double convertedValue = ResolveMeasurable(targetUnit).ConvertFromBaseUnit(baseResult);
+            return new Quantity<U>(Math.Round(convertedValue, 2), targetUnit);
+        }
+
+        /// <summary>
+        /// Divides two base-unit values and enforces non-zero divisor semantics.
+        /// </summary>
+        /// <param name="dividend">The base-unit dividend.</param>
+        /// <param name="divisor">The base-unit divisor.</param>
+        /// <returns>The scalar quotient.</returns>
+        /// <exception cref="ArithmeticException">Thrown when divisor is zero.</exception>
+        private static double DivideBaseValues(double dividend, double divisor)
+        {
+            if (Math.Abs(divisor) < Epsilon)
                 throw new ArithmeticException("Cannot divide by zero quantity.");
 
-            return thisValueInBase / otherValueInBase;
+            return dividend / divisor;
         }
 
         /// <summary>
