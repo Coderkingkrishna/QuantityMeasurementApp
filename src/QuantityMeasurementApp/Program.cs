@@ -1,6 +1,6 @@
 ﻿using System;
-using QuantityMeasurementApp.Core.Models;
-using QuantityMeasurementApp.Core.Services;
+using QuantityMeasurementApp.Business;
+using QuantityMeasurementApp.Models;
 
 namespace QuantityMeasurementApp
 {
@@ -140,6 +140,17 @@ namespace QuantityMeasurementApp
         {
             try
             {
+                Console.Write("Start interactive menu? (y/N): ");
+                var choice = Console.ReadLine();
+                if (
+                    !string.IsNullOrWhiteSpace(choice)
+                    && choice.Trim().Equals("y", StringComparison.OrdinalIgnoreCase)
+                )
+                {
+                    QuantityMeasurementApp.UI.ConsoleMenu.Run();
+                    return;
+                }
+
                 var quantityMeasurementService = new QuantityMeasurementService();
 
                 Console.WriteLine("=== Length Operations ===");
