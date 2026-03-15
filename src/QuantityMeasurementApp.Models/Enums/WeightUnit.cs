@@ -14,10 +14,19 @@ namespace QuantityMeasurementApp.Models
         private sealed class WeightMeasurable : IMeasurable
         {
             private readonly WeightUnit unit;
-            public WeightMeasurable(WeightUnit unit) { this.unit = unit; }
+
+            public WeightMeasurable(WeightUnit unit)
+            {
+                this.unit = unit;
+            }
+
             public double GetConversionFactor() => unit.GetConversionFactor();
+
             public double ConvertToBaseUnit(double value) => unit.ConvertToBaseUnit(value);
-            public double ConvertFromBaseUnit(double baseValue) => unit.ConvertFromBaseUnit(baseValue);
+
+            public double ConvertFromBaseUnit(double baseValue) =>
+                unit.ConvertFromBaseUnit(baseValue);
+
             public string GetUnitName() => unit.GetUnitName();
         }
 
@@ -32,9 +41,15 @@ namespace QuantityMeasurementApp.Models
             };
         }
 
-        public static double ConvertToBaseUnit(this WeightUnit unit, double value) => value * unit.GetConversionFactor();
-        public static double ConvertFromBaseUnit(this WeightUnit unit, double baseValue) => baseValue / unit.GetConversionFactor();
-        public static string GetUnitName(this WeightUnit unit) => unit.ToString().ToUpperInvariant();
+        public static double ConvertToBaseUnit(this WeightUnit unit, double value) =>
+            value * unit.GetConversionFactor();
+
+        public static double ConvertFromBaseUnit(this WeightUnit unit, double baseValue) =>
+            baseValue / unit.GetConversionFactor();
+
+        public static string GetUnitName(this WeightUnit unit) =>
+            unit.ToString().ToUpperInvariant();
+
         public static IMeasurable AsMeasurable(this WeightUnit unit) => new WeightMeasurable(unit);
     }
 }

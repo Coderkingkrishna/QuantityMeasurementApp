@@ -10,12 +10,6 @@ namespace QuantityMeasurementApp.Business
     /// </summary>
     public class QuantityMeasurementServiceImpl : IQuantityMeasurementService
     {
-        public bool AreEqual(Feet firstMeasurement, Feet secondMeasurement) =>
-            firstMeasurement.Equals(secondMeasurement);
-
-        public bool AreEqual(Inches firstMeasurement, Inches secondMeasurement) =>
-            firstMeasurement.Equals(secondMeasurement);
-
         public bool AreEqual<U>(Quantity<U> firstMeasurement, Quantity<U> secondMeasurement)
             where U : struct, Enum
         {
@@ -217,6 +211,64 @@ namespace QuantityMeasurementApp.Business
             }
         }
 
+        public QuantityDTO Subtract(QuantityDTO a, QuantityDTO b, string? targetUnit = null)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(a);
+                ArgumentNullException.ThrowIfNull(b);
+
+                EnsureSameCategory(a, b);
+
+                return a.Category switch
+                {
+                    MeasurementCategory.Length => SubtractTyped<LengthUnit>(a, b, targetUnit),
+                    MeasurementCategory.Weight => SubtractTyped<WeightUnit>(a, b, targetUnit),
+                    MeasurementCategory.Volume => SubtractTyped<VolumeUnit>(a, b, targetUnit),
+                    MeasurementCategory.Temperature => throw new InvalidOperationException(
+                        "Temperature subtraction is not supported."
+                    ),
+                    _ => throw new ArgumentException(
+                        "Unsupported measurement category.",
+                        nameof(a)
+                    ),
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exceptions.QuantityMeasurementException("Subtraction failed", ex);
+            }
+        }
+
+        public double Divide(QuantityDTO a, QuantityDTO b)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(a);
+                ArgumentNullException.ThrowIfNull(b);
+
+                EnsureSameCategory(a, b);
+
+                return a.Category switch
+                {
+                    MeasurementCategory.Length => DivideTyped<LengthUnit>(a, b),
+                    MeasurementCategory.Weight => DivideTyped<WeightUnit>(a, b),
+                    MeasurementCategory.Volume => DivideTyped<VolumeUnit>(a, b),
+                    MeasurementCategory.Temperature => throw new InvalidOperationException(
+                        "Temperature division is not supported."
+                    ),
+                    _ => throw new ArgumentException(
+                        "Unsupported measurement category.",
+                        nameof(a)
+                    ),
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exceptions.QuantityMeasurementException("Division failed", ex);
+            }
+        }
+
         private static void EnsureSameCategory(QuantityDTO first, QuantityDTO second)
         {
             if (first.Category != second.Category)
@@ -261,6 +313,31 @@ namespace QuantityMeasurementApp.Business
                 : left.Add(right, ParseUnit<U>(targetUnit));
 
             return new QuantityDTO(result.Value, result.Unit.ToString(), first.Category);
+        }
+
+        private static QuantityDTO SubtractTyped<U>(
+            QuantityDTO first,
+            QuantityDTO second,
+            string? targetUnit
+        )
+            where U : struct, Enum
+        {
+            var left = new Quantity<U>(first.Value, ParseUnit<U>(first.Unit));
+            var right = new Quantity<U>(second.Value, ParseUnit<U>(second.Unit));
+
+            Quantity<U> result = string.IsNullOrWhiteSpace(targetUnit)
+                ? left.Subtract(right)
+                : left.Subtract(right, ParseUnit<U>(targetUnit));
+
+            return new QuantityDTO(result.Value, result.Unit.ToString(), first.Category);
+        }
+
+        private static double DivideTyped<U>(QuantityDTO first, QuantityDTO second)
+            where U : struct, Enum
+        {
+            var left = new Quantity<U>(first.Value, ParseUnit<U>(first.Unit));
+            var right = new Quantity<U>(second.Value, ParseUnit<U>(second.Unit));
+            return left.Divide(right);
         }
 
         private static U ParseUnit<U>(string unitName)

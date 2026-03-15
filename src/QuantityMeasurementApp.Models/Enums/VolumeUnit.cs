@@ -14,10 +14,19 @@ namespace QuantityMeasurementApp.Models
         private sealed class VolumeMeasurable : IMeasurable
         {
             private readonly VolumeUnit unit;
-            public VolumeMeasurable(VolumeUnit unit) { this.unit = unit; }
+
+            public VolumeMeasurable(VolumeUnit unit)
+            {
+                this.unit = unit;
+            }
+
             public double GetConversionFactor() => unit.GetConversionFactor();
+
             public double ConvertToBaseUnit(double value) => unit.ConvertToBaseUnit(value);
-            public double ConvertFromBaseUnit(double baseValue) => unit.ConvertFromBaseUnit(baseValue);
+
+            public double ConvertFromBaseUnit(double baseValue) =>
+                unit.ConvertFromBaseUnit(baseValue);
+
             public string GetUnitName() => unit.GetUnitName();
         }
 
@@ -32,9 +41,15 @@ namespace QuantityMeasurementApp.Models
             };
         }
 
-        public static double ConvertToBaseUnit(this VolumeUnit unit, double value) => value * unit.GetConversionFactor();
-        public static double ConvertFromBaseUnit(this VolumeUnit unit, double baseValue) => baseValue / unit.GetConversionFactor();
-        public static string GetUnitName(this VolumeUnit unit) => unit.ToString().ToUpperInvariant();
+        public static double ConvertToBaseUnit(this VolumeUnit unit, double value) =>
+            value * unit.GetConversionFactor();
+
+        public static double ConvertFromBaseUnit(this VolumeUnit unit, double baseValue) =>
+            baseValue / unit.GetConversionFactor();
+
+        public static string GetUnitName(this VolumeUnit unit) =>
+            unit.ToString().ToUpperInvariant();
+
         public static IMeasurable AsMeasurable(this VolumeUnit unit) => new VolumeMeasurable(unit);
     }
 }

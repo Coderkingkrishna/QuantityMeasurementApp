@@ -50,7 +50,14 @@ namespace QuantityMeasurementApp.Models
         where U : struct, Enum
     {
         private const double Epsilon = 1e-6;
-        private enum ArithmeticOperation { Add, Subtract, Divide }
+
+        private enum ArithmeticOperation
+        {
+            Add,
+            Subtract,
+            Divide,
+        }
+
         public double Value { get; }
         public U Unit { get; }
 
@@ -122,34 +129,61 @@ namespace QuantityMeasurementApp.Models
 
         public Quantity<U> Add(Quantity<U> other, U targetUnit)
         {
-            ValidateArithmeticOperands(other, targetUnit, targetUnitRequired: true, operation: ArithmeticOperation.Add);
+            ValidateArithmeticOperands(
+                other,
+                targetUnit,
+                targetUnitRequired: true,
+                operation: ArithmeticOperation.Add
+            );
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.Add);
             return ConvertBaseResultToQuantity(baseResult, targetUnit);
         }
 
         public Quantity<U> Add(double value, U unit) => Add(new Quantity<U>(value, unit));
-        public Quantity<U> Add(double value, U unit, U targetUnit) => Add(new Quantity<U>(value, unit), targetUnit);
+
+        public Quantity<U> Add(double value, U unit, U targetUnit) =>
+            Add(new Quantity<U>(value, unit), targetUnit);
+
         public Quantity<U> Subtract(Quantity<U> other) => Subtract(other, Unit);
+
         public Quantity<U> Subtract(Quantity<U> other, U targetUnit)
         {
-            ValidateArithmeticOperands(other, targetUnit, targetUnitRequired: true, operation: ArithmeticOperation.Subtract);
+            ValidateArithmeticOperands(
+                other,
+                targetUnit,
+                targetUnitRequired: true,
+                operation: ArithmeticOperation.Subtract
+            );
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.Subtract);
             return ConvertBaseResultToQuantity(baseResult, targetUnit);
         }
 
         public double Divide(Quantity<U> other)
         {
-            ValidateArithmeticOperands(other, null, targetUnitRequired: false, operation: ArithmeticOperation.Divide);
+            ValidateArithmeticOperands(
+                other,
+                null,
+                targetUnitRequired: false,
+                operation: ArithmeticOperation.Divide
+            );
             return PerformBaseArithmetic(other, ArithmeticOperation.Divide);
         }
 
-        private void ValidateArithmeticOperands(Quantity<U> other, U? targetUnit, bool targetUnitRequired, ArithmeticOperation operation)
+        private void ValidateArithmeticOperands(
+            Quantity<U> other,
+            U? targetUnit,
+            bool targetUnitRequired,
+            ArithmeticOperation operation
+        )
         {
             if (other is null)
                 throw new ArgumentNullException(nameof(other));
 
             if (Unit.GetType() != other.Unit.GetType())
-                throw new ArgumentException("Quantities must belong to the same measurement category.", nameof(other));
+                throw new ArgumentException(
+                    "Quantities must belong to the same measurement category.",
+                    nameof(other)
+                );
 
             ValidateFiniteQuantity(this, nameof(Value));
             ValidateFiniteQuantity(other, nameof(other));
@@ -164,13 +198,18 @@ namespace QuantityMeasurementApp.Models
                 throw new ArgumentException("Target unit is required.", nameof(targetUnit));
 
             if (!MeasurableResolver.TryResolve(targetUnit.Value, out _))
-                throw new ArgumentException($"Unsupported unit: {targetUnit.Value}", nameof(targetUnit));
+                throw new ArgumentException(
+                    $"Unsupported unit: {targetUnit.Value}",
+                    nameof(targetUnit)
+                );
         }
 
         private double PerformBaseArithmetic(Quantity<U> other, ArithmeticOperation operation)
         {
             double thisValueInBase = ResolveMeasurable(Unit).ConvertToBaseUnit(Value);
-            double otherValueInBase = other.ResolveMeasurable(other.Unit).ConvertToBaseUnit(other.Value);
+            double otherValueInBase = other
+                .ResolveMeasurable(other.Unit)
+                .ConvertToBaseUnit(other.Value);
             return operation switch
             {
                 ArithmeticOperation.Add => thisValueInBase + otherValueInBase,
