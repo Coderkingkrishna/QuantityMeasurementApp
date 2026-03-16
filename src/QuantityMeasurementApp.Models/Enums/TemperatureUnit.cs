@@ -14,15 +14,32 @@ namespace QuantityMeasurementApp.Models
         private sealed class TemperatureMeasurable : IMeasurable
         {
             private readonly TemperatureUnit unit;
-            public TemperatureMeasurable(TemperatureUnit unit) { this.unit = unit; }
+
+            public TemperatureMeasurable(TemperatureUnit unit)
+            {
+                this.unit = unit;
+            }
+
             public double GetConversionFactor() => unit.GetConversionFactor();
+
             public double ConvertToBaseUnit(double value) => unit.ConvertToBaseUnit(value);
-            public double ConvertFromBaseUnit(double baseValue) => unit.ConvertFromBaseUnit(baseValue);
+
+            public double ConvertFromBaseUnit(double baseValue) =>
+                unit.ConvertFromBaseUnit(baseValue);
+
             public string GetUnitName() => unit.GetUnitName();
-            public bool SupportsArithmetic() { SupportsArithmetic sa = () => false; return sa(); }
+
+            public bool SupportsArithmetic()
+            {
+                SupportsArithmetic sa = () => false;
+                return sa();
+            }
+
             public void ValidateOperationSupport(string operation)
             {
-                throw new NotSupportedException($"Temperature does not support {operation} operation for absolute values.");
+                throw new NotSupportedException(
+                    $"Temperature does not support {operation} operation for absolute values."
+                );
             }
         }
 
@@ -50,7 +67,10 @@ namespace QuantityMeasurementApp.Models
             };
         }
 
-        public static string GetUnitName(this TemperatureUnit unit) => unit.ToString().ToUpperInvariant();
-        public static IMeasurable AsMeasurable(this TemperatureUnit unit) => new TemperatureMeasurable(unit);
+        public static string GetUnitName(this TemperatureUnit unit) =>
+            unit.ToString().ToUpperInvariant();
+
+        public static IMeasurable AsMeasurable(this TemperatureUnit unit) =>
+            new TemperatureMeasurable(unit);
     }
 }
