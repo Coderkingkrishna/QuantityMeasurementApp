@@ -1,4 +1,4 @@
-namespace QuantityMeasurementApp.Models
+namespace QuantityMeasurementApp.Business
 {
     public delegate bool SupportsArithmetic();
 

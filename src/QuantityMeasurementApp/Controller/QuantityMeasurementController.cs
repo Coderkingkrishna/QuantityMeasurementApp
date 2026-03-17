@@ -1,7 +1,8 @@
 using System;
+using QuantityMeasurementApp.Business;
 using QuantityMeasurementApp.Models.DTOs;
 
-namespace QuantityMeasurementApp.Business
+namespace QuantityMeasurementApp.Controller
 {
     public class QuantityMeasurementController
     {
@@ -24,7 +25,7 @@ namespace QuantityMeasurementApp.Business
                 var result = _service.Compare(a, b);
                 DisplayResult($"Comparison result: {result}");
             }
-            catch (Exceptions.QuantityMeasurementException ex)
+            catch (Business.Exceptions.QuantityMeasurementException ex)
             {
                 DisplayResult($"Error: {ex.Message}");
             }
@@ -37,7 +38,7 @@ namespace QuantityMeasurementApp.Business
                 var result = _service.Convert(source, targetUnit);
                 DisplayResult($"Converted result: {result.Value} {result.Unit}");
             }
-            catch (Exceptions.QuantityMeasurementException ex)
+            catch (Business.Exceptions.QuantityMeasurementException ex)
             {
                 DisplayResult($"Error: {ex.Message}");
             }
@@ -50,7 +51,7 @@ namespace QuantityMeasurementApp.Business
                 var result = _service.Add(a, b, targetUnit);
                 DisplayResult($"Addition result: {result.Value} {result.Unit}");
             }
-            catch (Exceptions.QuantityMeasurementException ex)
+            catch (Business.Exceptions.QuantityMeasurementException ex)
             {
                 DisplayResult($"Error: {ex.Message}");
             }
@@ -63,7 +64,7 @@ namespace QuantityMeasurementApp.Business
                 var result = _service.Subtract(a, b, targetUnit);
                 DisplayResult($"Subtraction result: {result.Value} {result.Unit}");
             }
-            catch (Exceptions.QuantityMeasurementException ex)
+            catch (Business.Exceptions.QuantityMeasurementException ex)
             {
                 DisplayResult($"Error: {ex.Message}");
             }
@@ -76,7 +77,7 @@ namespace QuantityMeasurementApp.Business
                 var result = _service.Divide(a, b);
                 DisplayResult($"Division result: {result}");
             }
-            catch (Exceptions.QuantityMeasurementException ex)
+            catch (Business.Exceptions.QuantityMeasurementException ex)
             {
                 DisplayResult($"Error: {ex.Message}");
             }

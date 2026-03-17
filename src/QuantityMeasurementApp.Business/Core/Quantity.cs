@@ -1,6 +1,7 @@
 using System;
+using QuantityMeasurementApp.Models;
 
-namespace QuantityMeasurementApp.Models
+namespace QuantityMeasurementApp.Business
 {
     internal interface IQuantityComparable
     {

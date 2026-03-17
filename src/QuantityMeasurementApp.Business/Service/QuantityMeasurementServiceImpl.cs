@@ -159,18 +159,12 @@ namespace QuantityMeasurementApp.Business
                 throw new ArgumentException("Both quantities must belong to the same category.");
         }
 
-        private static Quantity<U> ConvertTyped<U>(QuantityDTO source, string targetUnit)
+        private static QuantityDTO ConvertTypedToDto<U>(QuantityDTO source, string targetUnit)
             where U : struct, Enum
         {
             var sourceUnit = ParseUnit<U>(source.Unit);
             var target = ParseUnit<U>(targetUnit);
-            return new Quantity<U>(source.Value, sourceUnit).ConvertTo(target);
-        }
-
-        private static QuantityDTO ConvertTypedToDto<U>(QuantityDTO source, string targetUnit)
-            where U : struct, Enum
-        {
-            var converted = ConvertTyped<U>(source, targetUnit);
+            var converted = new Quantity<U>(source.Value, sourceUnit).ConvertTo(target);
             return new QuantityDTO(converted.Value, converted.Unit.ToString(), source.Category);
         }
 
