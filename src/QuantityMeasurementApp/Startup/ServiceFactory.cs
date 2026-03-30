@@ -1,4 +1,5 @@
 using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using QuantityMeasurementApp.Business;
 using QuantityMeasurementApp.Repository;
@@ -55,7 +56,14 @@ namespace QuantityMeasurementApp.Startup
 
                 try
                 {
-                    return new QuantityMeasurementDatabaseRepository(connectionString);
+                    var options = new DbContextOptionsBuilder<QuantityMeasurementDbContext>()
+                        .UseSqlServer(connectionString)
+                        .Options;
+
+                    var dbContext = new QuantityMeasurementDbContext(options);
+                    dbContext.Database.Migrate();
+
+                    return new QuantityMeasurementDatabaseRepository(dbContext);
                 }
                 catch (Exception ex)
                 {
