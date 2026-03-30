@@ -31,6 +31,9 @@ namespace QuantityMeasurementApp.Repository
                 options.UseSqlServer(sqlConnectionString)
             );
 
+            services.AddScoped<IUserRepository, UserDatabaseRepository>();
+            services.AddScoped<IRevokedTokenRepository, RevokedTokenDatabaseRepository>();
+
             // Base repository always writes/reads from SQL Server.
             services.AddScoped<QuantityMeasurementDatabaseRepository>();
 

@@ -14,6 +14,10 @@ namespace QuantityMeasurementApp.Repository
         public DbSet<QuantityMeasurementEntity> QuantityMeasurementOperations =>
             Set<QuantityMeasurementEntity>();
 
+        public DbSet<UserEntity> Users => Set<UserEntity>();
+
+        public DbSet<RevokedTokenEntity> RevokedTokens => Set<RevokedTokenEntity>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<QuantityMeasurementEntity>(entity =>
@@ -29,6 +33,38 @@ namespace QuantityMeasurementApp.Repository
                 entity.Property(e => e.CreatedAt).IsRequired();
 
                 entity.HasIndex(e => e.CreatedAt).HasDatabaseName("IX_QuantityMeasurementOperations_CreatedAt");
+            });
+
+            modelBuilder.Entity<UserEntity>(entity =>
+            {
+                entity.ToTable("Users", "dbo");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(150);
+                entity.Property(e => e.Email).IsRequired().HasMaxLength(256);
+                entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(256);
+                entity.Property(e => e.PasswordSalt).IsRequired().HasMaxLength(256);
+                entity.Property(e => e.CreatedAt).IsRequired();
+
+                entity.HasIndex(e => e.Email).IsUnique().HasDatabaseName("IX_Users_Email");
+                entity.HasIndex(e => e.CreatedAt).HasDatabaseName("IX_Users_CreatedAt");
+            });
+
+            modelBuilder.Entity<RevokedTokenEntity>(entity =>
+            {
+                entity.ToTable("RevokedTokens", "dbo");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.TokenId).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.ExpiresAtUtc).IsRequired();
+                entity.Property(e => e.RevokedAtUtc).IsRequired();
+
+                entity.HasIndex(e => e.TokenId).IsUnique().HasDatabaseName("IX_RevokedTokens_TokenId");
+                entity
+                    .HasIndex(e => e.ExpiresAtUtc)
+                    .HasDatabaseName("IX_RevokedTokens_ExpiresAtUtc");
             });
         }
     }

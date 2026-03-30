@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuantityMeasurementApp.Repository;
 
@@ -11,9 +12,11 @@ using QuantityMeasurementApp.Repository;
 namespace QuantityMeasurementApp.Repository.database.Migrations
 {
     [DbContext(typeof(QuantityMeasurementDbContext))]
-    partial class QuantityMeasurementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260330055956_AddUserAuthentication")]
+    partial class AddUserAuthentication
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
