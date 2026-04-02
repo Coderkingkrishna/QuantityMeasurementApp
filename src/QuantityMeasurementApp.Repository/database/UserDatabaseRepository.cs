@@ -26,6 +26,11 @@ namespace QuantityMeasurementApp.Repository
             return _dbContext.Users.AsNoTracking().FirstOrDefault(user => user.Email == normalizedEmail);
         }
 
+        public bool Exists(Guid userId)
+        {
+            return _dbContext.Users.AsNoTracking().Any(user => user.Id == userId);
+        }
+
         public void Add(UserEntity user)
         {
             ArgumentNullException.ThrowIfNull(user);

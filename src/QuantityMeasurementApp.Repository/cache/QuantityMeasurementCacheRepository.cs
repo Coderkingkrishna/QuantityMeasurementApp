@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using QuantityMeasurementApp.Models.Entities;
 
 namespace QuantityMeasurementApp.Repository
@@ -18,5 +19,8 @@ namespace QuantityMeasurementApp.Repository
         }
 
         public IEnumerable<QuantityMeasurementEntity> GetAll() => _cache.AsReadOnly();
+
+        public IEnumerable<QuantityMeasurementEntity> GetByUserId(Guid userId) =>
+            _cache.Where(entry => entry.UserId == userId).ToList();
     }
 }

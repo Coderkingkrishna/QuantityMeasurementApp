@@ -34,5 +34,14 @@ namespace QuantityMeasurementApp.Repository
                 .OrderByDescending(entity => entity.CreatedAt)
                 .ToList();
         }
+
+        public IEnumerable<QuantityMeasurementEntity> GetByUserId(Guid userId)
+        {
+            return _dbContext
+                .QuantityMeasurementOperations.AsNoTracking()
+                .Where(entity => entity.UserId == userId)
+                .OrderByDescending(entity => entity.CreatedAt)
+                .ToList();
+        }
     }
 }

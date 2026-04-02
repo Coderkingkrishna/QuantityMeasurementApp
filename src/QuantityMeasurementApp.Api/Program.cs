@@ -20,6 +20,17 @@ builder
             new JsonStringEnumConverter(allowIntegerValues: false)
         );
     });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        "FrontendDev",
+        policy =>
+            policy
+                .SetIsOriginAllowed(_ => true)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+    );
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -122,6 +133,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("FrontendDev");
 
 app.UseAuthentication();
 app.UseAuthorization();

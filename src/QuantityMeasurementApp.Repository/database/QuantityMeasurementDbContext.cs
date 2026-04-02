@@ -31,8 +31,16 @@ namespace QuantityMeasurementApp.Repository
                 entity.Property(e => e.IsError).IsRequired();
                 entity.Property(e => e.ErrorMessage).IsRequired().HasMaxLength(1000);
                 entity.Property(e => e.CreatedAt).IsRequired();
+                entity.Property(e => e.UserId).IsRequired(false);
 
                 entity.HasIndex(e => e.CreatedAt).HasDatabaseName("IX_QuantityMeasurementOperations_CreatedAt");
+                entity.HasIndex(e => e.UserId).HasDatabaseName("IX_QuantityMeasurementOperations_UserId");
+
+                entity
+                    .HasOne<UserEntity>()
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<UserEntity>(entity =>

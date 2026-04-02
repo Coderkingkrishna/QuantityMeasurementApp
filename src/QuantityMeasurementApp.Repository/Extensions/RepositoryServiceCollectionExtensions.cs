@@ -40,19 +40,31 @@ namespace QuantityMeasurementApp.Repository
             var redisConnectionString = configuration.GetConnectionString("Redis");
             if (!string.IsNullOrWhiteSpace(redisConnectionString))
             {
-                // When Redis is configured, wrap DB repository with cache-aside behavior.
-                services.AddSingleton<IConnectionMultiplexer>(_ =>
-                    ConnectionMultiplexer.Connect(redisConnectionString)
-                );
+                try
+                {
+                    // Keep API usable even when Redis is temporarily unavailable.
+                    var options = ConfigurationOptions.Parse(redisConnectionString);
+                    options.AbortOnConnectFail = true;
+                    options.ConnectRetry = 0;
+                    options.ConnectTimeout = 1000;
+                    options.SyncTimeout = 1000;
 
-                services.AddScoped<IQuantityMeasurementRepository>(serviceProvider =>
-                    new QuantityMeasurementRedisRepository(
-                        serviceProvider.GetRequiredService<QuantityMeasurementDatabaseRepository>(),
-                        serviceProvider.GetRequiredService<IConnectionMultiplexer>()
-                    )
-                );
+                    var multiplexer = ConnectionMultiplexer.Connect(options);
+                    services.AddSingleton<IConnectionMultiplexer>(multiplexer);
 
-                return services;
+                    services.AddScoped<IQuantityMeasurementRepository>(serviceProvider =>
+                        new QuantityMeasurementRedisRepository(
+                            serviceProvider.GetRequiredService<QuantityMeasurementDatabaseRepository>(),
+                            serviceProvider.GetRequiredService<IConnectionMultiplexer>()
+                        )
+                    );
+
+                    return services;
+                }
+                catch
+                {
+                    // Fall back to SQL-only repository when Redis connection cannot be established.
+                }
             }
 
             services.AddScoped<IQuantityMeasurementRepository, QuantityMeasurementDatabaseRepository>();

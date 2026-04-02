@@ -43,10 +43,16 @@ namespace QuantityMeasurementApp.Repository.database.Migrations
                     b.Property<bool>("IsError")
                         .HasColumnType("bit");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt")
                         .HasDatabaseName("IX_QuantityMeasurementOperations_CreatedAt");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_QuantityMeasurementOperations_UserId");
 
                     b.ToTable("QuantityMeasurementOperations", "dbo");
                 });
@@ -117,6 +123,14 @@ namespace QuantityMeasurementApp.Repository.database.Migrations
                         .HasDatabaseName("IX_Users_Email");
 
                     b.ToTable("Users", "dbo");
+                });
+
+            modelBuilder.Entity("QuantityMeasurementApp.Models.Entities.QuantityMeasurementEntity", b =>
+                {
+                    b.HasOne("QuantityMeasurementApp.Models.Entities.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 #pragma warning restore 612, 618
         }

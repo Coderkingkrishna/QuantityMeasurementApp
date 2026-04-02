@@ -7,5 +7,6 @@ namespace QuantityMeasurementApp.Repository
     {
         void Save(QuantityMeasurementEntity entity);
         IEnumerable<QuantityMeasurementEntity> GetAll();
+        IEnumerable<QuantityMeasurementEntity> GetByUserId(Guid userId);
     }
 }
