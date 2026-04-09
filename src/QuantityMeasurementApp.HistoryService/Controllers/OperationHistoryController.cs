@@ -11,10 +11,15 @@ namespace QuantityMeasurementApp.HistoryService.Controllers;
 public class OperationHistoryController : ControllerBase
 {
     private readonly IQuantityMeasurementRepository _repository;
+    private readonly IUserRepository _userRepository;
 
-    public OperationHistoryController(IQuantityMeasurementRepository repository)
+    public OperationHistoryController(
+        IQuantityMeasurementRepository repository,
+        IUserRepository userRepository
+    )
     {
         _repository = repository;
+        _userRepository = userRepository;
     }
 
     [HttpGet]
@@ -28,11 +33,22 @@ public class OperationHistoryController : ControllerBase
         return Ok(items);
     }
 
-    [HttpGet("user/{userId:guid}")]
-    public ActionResult<IReadOnlyList<OperationHistoryDTO>> GetByUser(Guid userId)
+    [HttpGet("user/{email}")]
+    public ActionResult<IReadOnlyList<OperationHistoryDTO>> GetByUser(string email)
     {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return BadRequest("Email is required.");
+        }
+
+        var user = _userRepository.GetByEmail(email);
+        if (user is null)
+        {
+            return NotFound("User not found for the provided email.");
+        }
+
         var items = _repository
-            .GetByUserId(userId)
+            .GetByUserId(user.Id)
             .Select(MapToDto)
             .ToList();
 

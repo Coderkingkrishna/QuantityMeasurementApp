@@ -33,7 +33,7 @@ dotnet run --project src/QuantityMeasurementApp.HistoryService/QuantityMeasureme
 
 - `GET /health`
 - `GET /api/history`
-- `GET /api/history/user/{userId}`
+- `GET /api/history/user/{email}`
 - `POST /api/history`
 
 You can use the request samples in:

@@ -10,7 +10,7 @@ Accept: application/json
 
 ###
 
-GET {{QuantityMeasurementApp.HistoryService_HostAddress}}/api/history/user/00000000-0000-0000-0000-000000000000
+GET {{QuantityMeasurementApp.HistoryService_HostAddress}}/api/history/user/test%40example.com
 Accept: application/json
 
 ###
