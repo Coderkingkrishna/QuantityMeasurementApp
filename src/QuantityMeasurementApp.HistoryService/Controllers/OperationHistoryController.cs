@@ -77,6 +77,7 @@ public class OperationHistoryController : ControllerBase
                 Description = entity.Description,
                 IsError = entity.IsError,
                 ErrorMessage = entity.ErrorMessage,
+                
             }
         );
     }
