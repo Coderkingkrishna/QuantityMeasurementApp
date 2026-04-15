@@ -1,15 +1,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /source
 
-# Copy solution and all project files
-COPY ["QuantityMeasurementApp.sln", "."]
+# Copy only the project files needed for the API
 COPY ["src/QuantityMeasurementApp.Api/QuantityMeasurementApp.Api.csproj", "src/QuantityMeasurementApp.Api/"]
 COPY ["src/QuantityMeasurementApp.Business/QuantityMeasurementApp.Business.csproj", "src/QuantityMeasurementApp.Business/"]
 COPY ["src/QuantityMeasurementApp.Models/QuantityMeasurementApp.Models.csproj", "src/QuantityMeasurementApp.Models/"]
 COPY ["src/QuantityMeasurementApp.Repository/QuantityMeasurementApp.Repository.csproj", "src/QuantityMeasurementApp.Repository/"]
 
-# Restore dependencies
-RUN dotnet restore "QuantityMeasurementApp.sln"
+# Restore dependencies for the API project only
+RUN dotnet restore "src/QuantityMeasurementApp.Api/QuantityMeasurementApp.Api.csproj"
 
 # Copy the rest of the source code
 COPY . .
