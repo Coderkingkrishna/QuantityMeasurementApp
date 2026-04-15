@@ -126,15 +126,15 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure middleware pipeline.
-if (app.Environment.IsDevelopment())
-{
+// if (app.Environment.IsDevelopment())
+// {
     app.UseSwagger();
     // app.UseSwaggerUI(options =>
     // {
     //     options.DefaultModelsExpandDepth(-1);
     // });
     app.UseSwaggerUI();
-}
+//}
 
 app.UseHttpsRedirection();
 
