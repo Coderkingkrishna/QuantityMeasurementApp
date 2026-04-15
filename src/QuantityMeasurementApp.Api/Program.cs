@@ -23,11 +23,18 @@ builder
     });
 builder.Services.AddCors(options =>
 {
+    var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+        ??
+        [
+            "http://localhost:4200",
+            "https://quantitymeasurementapp-frontend-bh2q.onrender.com"
+        ];
+
     options.AddPolicy(
-        "FrontendDev",
+        "FrontendClients",
         policy =>
             policy
-                .SetIsOriginAllowed(_ => true)
+                .WithOrigins(allowedOrigins)
                 .AllowAnyHeader()
                 .AllowAnyMethod()
     );
@@ -138,7 +145,7 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 
-app.UseCors("FrontendDev");
+app.UseCors("FrontendClients");
 
 app.UseAuthentication();
 app.UseAuthorization();
