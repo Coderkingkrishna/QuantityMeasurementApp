@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -125,11 +126,35 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+var applyMigrationsOnStartup = builder.Configuration.GetValue("Database:ApplyMigrationsOnStartup", true);
+var failFastOnMigrationError = builder.Configuration.GetValue(
+    "Database:FailFastOnMigrationError",
+    !app.Environment.IsDevelopment()
+);
+
 // Apply pending EF migrations at startup so schema stays aligned with code.
-using (var scope = app.Services.CreateScope())
+if (applyMigrationsOnStartup)
 {
+    using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<QuantityMeasurementDbContext>();
-    dbContext.Database.Migrate();
+    var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("StartupMigration");
+
+    try
+    {
+        dbContext.Database.Migrate();
+    }
+    catch (SqlException ex)
+    {
+        logger.LogError(ex, "Database migration failed while connecting to SQL Server.");
+        if (failFastOnMigrationError)
+        {
+            throw;
+        }
+
+        logger.LogWarning(
+            "Continuing startup without applying migrations because Database:FailFastOnMigrationError is disabled."
+        );
+    }
 }
 
 // Configure middleware pipeline.
