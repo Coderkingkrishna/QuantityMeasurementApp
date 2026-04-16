@@ -4,6 +4,24 @@ using QuantityMeasurementApp.Repository;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+        ??
+        [
+            "http://localhost:4200",
+            "https://quantitymeasurementapp-frontend-bh2q.onrender.com"
+        ];
+
+    options.AddPolicy(
+        "FrontendClients",
+        policy =>
+            policy
+                .WithOrigins(allowedOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+    );
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddQuantityMeasurementRepository(builder.Configuration);
@@ -22,6 +40,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+    app.UseCors("FrontendClients");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 

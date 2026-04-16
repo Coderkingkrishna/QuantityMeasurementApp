@@ -1,0 +1,39 @@
+@QuantityMeasurementApp.QuantityService_HostAddress = http://localhost:5302
+
+GET {{QuantityMeasurementApp.QuantityService_HostAddress}}/health
+Accept: application/json
+
+###
+
+POST {{QuantityMeasurementApp.QuantityService_HostAddress}}/api/quantitymeasurement/convert
+Content-Type: application/json
+
+{
+  "source": {
+    "value": 1,
+    "unit": "Feet",
+    "category": "Length"
+  },
+  "targetUnit": "Inches"
+}
+
+###
+
+POST {{QuantityMeasurementApp.QuantityService_HostAddress}}/api/quantitymeasurement/add
+Content-Type: application/json
+
+{
+  "first": {
+    "value": 1,
+    "unit": "Feet",
+    "category": "Length"
+  },
+  "second": {
+    "value": 12,
+    "unit": "Inches",
+    "category": "Length"
+  },
+  "targetUnit": "Feet"
+}
+
+###

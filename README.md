@@ -13,23 +13,66 @@ Each use case expands functionality in a controlled and maintainable way.
 
 ## 🧩 Microservices (Initial Setup)
 
-The solution now includes one dedicated microservice:
+The solution now includes three dedicated microservices:
 
+- `QuantityMeasurementApp.AuthService`
+- `QuantityMeasurementApp.QuantityService`
 - `QuantityMeasurementApp.HistoryService`
 
-### What it does
+### AuthService
 
-- Exposes operation history APIs
-- Persists and reads operation history via existing SQL/Redis repository layer
-- Runs independently from the main API service
+- Handles signup, login, Google login, and logout
+- Issues and revokes JWTs
+- Runs independently from the quantity APIs
 
-### Run it
+Run it:
 
 ```bash
-dotnet run --project src/QuantityMeasurementApp.HistoryService/QuantityMeasurementApp.HistoryService.csproj
+dotnet run --project src/microservices/QuantityMeasurementApp.AuthService/QuantityMeasurementApp.AuthService.csproj
 ```
 
-### Endpoints
+Endpoints:
+
+- `GET /health`
+- `POST /api/auth/signup`
+- `POST /api/auth/login`
+- `POST /api/auth/google`
+- `POST /api/auth/logout`
+
+### QuantityService
+
+- Handles convert, compare, add, subtract, and divide operations
+- Persists operation audit records through the shared repository layer
+- Accepts JWTs when available so user-linked audit data continues to work
+
+Run it:
+
+```bash
+dotnet run --project src/microservices/QuantityMeasurementApp.QuantityService/QuantityMeasurementApp.QuantityService.csproj
+```
+
+Endpoints:
+
+- `GET /health`
+- `POST /api/quantitymeasurement/convert`
+- `POST /api/quantitymeasurement/compare`
+- `POST /api/quantitymeasurement/add`
+- `POST /api/quantitymeasurement/subtract`
+- `POST /api/quantitymeasurement/divide`
+
+### HistoryService
+
+- Exposes operation history APIs
+- Resolves history by email and reads data through the shared repository layer
+- Runs independently from the main API service
+
+Run it:
+
+```bash
+dotnet run --project src/microservices/QuantityMeasurementApp.HistoryService/QuantityMeasurementApp.HistoryService.csproj
+```
+
+Endpoints:
 
 - `GET /health`
 - `GET /api/history`
@@ -38,7 +81,9 @@ dotnet run --project src/QuantityMeasurementApp.HistoryService/QuantityMeasureme
 
 You can use the request samples in:
 
-- `src/QuantityMeasurementApp.HistoryService/QuantityMeasurementApp.HistoryService.http`
+- `src/microservices/QuantityMeasurementApp.AuthService/QuantityMeasurementApp.AuthService.http`
+- `src/microservices/QuantityMeasurementApp.QuantityService/QuantityMeasurementApp.QuantityService.http`
+- `src/microservices/QuantityMeasurementApp.HistoryService/QuantityMeasurementApp.HistoryService.http`
 
 ---
 

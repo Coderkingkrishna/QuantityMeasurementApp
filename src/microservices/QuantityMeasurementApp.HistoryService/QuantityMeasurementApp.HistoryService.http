@@ -1,4 +1,4 @@
-@QuantityMeasurementApp.HistoryService_HostAddress = http://localhost:5295
+@QuantityMeasurementApp.HistoryService_HostAddress = http://localhost:5303
 
 GET {{QuantityMeasurementApp.HistoryService_HostAddress}}/health
 Accept: application/json
