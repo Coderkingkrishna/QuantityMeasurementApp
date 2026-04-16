@@ -9,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using QuantityMeasurementApp.AuthService.Options;
 using QuantityMeasurementApp.Business;
 using QuantityMeasurementApp.Repository;
+using BusinessJwtOptions = QuantityMeasurementApp.Business.JwtOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,7 +66,9 @@ builder.Services.AddSwaggerGen(options =>
     );
 });
 
-builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
+builder.Services.Configure<BusinessJwtOptions>(
+    builder.Configuration.GetSection(BusinessJwtOptions.SectionName)
+);
 builder.Services.Configure<GoogleAuthOptions>(
     builder.Configuration.GetSection(GoogleAuthOptions.SectionName)
 );
@@ -73,7 +76,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddQuantityMeasurementRepository(builder.Configuration);
 
 var jwtOptions =
-    builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
+    builder.Configuration.GetSection(BusinessJwtOptions.SectionName).Get<BusinessJwtOptions>()
+    ?? new BusinessJwtOptions();
 if (string.IsNullOrWhiteSpace(jwtOptions.Secret))
 {
     throw new InvalidOperationException(
